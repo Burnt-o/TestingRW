@@ -1,0 +1,14 @@
+﻿<Window x:Class="TestingRW.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TestingRW"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Button x:Name="DumpH1CP" Content="DumpH1CP" HorizontalAlignment="Left" Height="96" Margin="67,62,0,0" VerticalAlignment="Top" Width="179" Click="DumpH1CP_Click"/>
+        <Button Content="InjectH1CP" HorizontalAlignment="Left" Height="99" Margin="409,70,0,0" VerticalAlignment="Top" Width="246" Click="InjectH1CP_Click"/>
+
+    </Grid>
+</Window>
