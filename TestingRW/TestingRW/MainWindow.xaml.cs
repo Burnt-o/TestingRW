@@ -222,8 +222,12 @@ namespace TestingRW
                 //get levelname from loaded cp instead
                 IntPtr baseaddy = Globals.halo1dll + 0x0224D1D8;
                 int[] offsets = { 0x28, 0x14 };
+
+
                 if (WriteProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offsets), buffer, buffer.Length, out int bytesWritten))
-                    Console.Write("Successfully inject CP, bytes written: " + bytesWritten.ToString());
+                {
+                    Console.WriteLine("Successfully injected CP, bytes written: " + bytesWritten.ToString());
+                }
                 else
                     throw new Win32Exception();
 
