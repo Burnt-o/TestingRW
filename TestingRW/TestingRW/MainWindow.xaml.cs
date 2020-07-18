@@ -68,6 +68,10 @@ namespace TestingRW
 
 
 
+        string hardcodedpath = @"C:\dumpedcp.bin";
+
+
+
 
         const int PROCESS_WM_READ = 0x0010;
         const int PROCESS_ALL_ACCESS = 0x1F0FFF;
@@ -79,7 +83,7 @@ namespace TestingRW
             Console.WriteLine("test: " + ReadLevelCode());
             //System.Windows.Application.Current.Shutdown();
 
-
+           
         }
 
         public static void GetBaseAddresses()
@@ -139,7 +143,7 @@ namespace TestingRW
             
             byte[] buffer = new byte[3];
             //get levelname from loaded cp instead
-            IntPtr baseaddy = Globals.halo1dll + 0x0224B5F8;
+            IntPtr baseaddy = Globals.halo1dll + 0x0224D1D8;
             int[] offsets = { 0x28, 0x23 };
             ReadProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offsets), buffer, buffer.Length, out int bytesRead);
             test = (Encoding.ASCII.GetString(buffer) + " (" + bytesRead.ToString() + "bytes)");
@@ -177,13 +181,13 @@ namespace TestingRW
 
             byte[] buffer = new byte[4956160];
             //get levelname from loaded cp instead
-            IntPtr baseaddy = Globals.halo1dll + 0x0224B5F8;
+            IntPtr baseaddy = Globals.halo1dll + 0x0224D1D8;
             int[] offsets = { 0x28, 0x14 };
 
             if (ReadProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offsets), buffer, buffer.Length, out int bytesRead))
             {
-                File.WriteAllBytes(@"E:\dumpedcp.bin", buffer);
-                FileInfo test = new FileInfo(@"E:\scripts\dumpedfiles\dumpedcp.bin");
+                File.WriteAllBytes(hardcodedpath, buffer);
+                FileInfo test = new FileInfo(hardcodedpath);
                 if (File.Exists(test.ToString()) && test.Length > 1000)
                 {
                     Console.WriteLine("SUCESSFULLY DUMPED CP, LENGTH: " + test.Length.ToString());
@@ -197,7 +201,7 @@ namespace TestingRW
 
         private void InjectH1CP_Click(object sender, RoutedEventArgs e)
         {
-            if (File.Exists(@"C:\dumpedcp.bin"))
+            if (File.Exists(hardcodedpath))
             {
                 Console.WriteLine("Injecting CP");
                 GetBaseAddresses();
@@ -205,7 +209,7 @@ namespace TestingRW
                 Process myProcess = Process.GetProcessesByName("MCC-Win64-Shipping")[0];
                 IntPtr processHandle = OpenProcess(PROCESS_ALL_ACCESS, false, myProcess.Id);
 
-                string filename = @"C:\dumpedcp.bin";
+                string filename = hardcodedpath;
                 FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read);
                 // Create a byte array of file stream length
                 byte[] buffer = System.IO.File.ReadAllBytes(filename);
@@ -216,7 +220,7 @@ namespace TestingRW
                 Console.WriteLine("ready to inject, buffer length: " + buffer.Length.ToString());
 
                 //get levelname from loaded cp instead
-                IntPtr baseaddy = Globals.halo1dll + 0x0224B5F8;
+                IntPtr baseaddy = Globals.halo1dll + 0x0224D1D8;
                 int[] offsets = { 0x28, 0x14 };
                 if (WriteProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offsets), buffer, buffer.Length, out int bytesWritten))
                     Console.Write("Successfully inject CP, bytes written: " + bytesWritten.ToString());
