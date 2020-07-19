@@ -80,7 +80,7 @@ namespace TestingRW
         {
             //InitializeComponent();
 
-            Console.WriteLine("test: " + ReadLevelCode());
+            //Console.WriteLine("test: " + ReadLevelCode());
             //System.Windows.Application.Current.Shutdown();
 
            
@@ -131,58 +131,133 @@ namespace TestingRW
         }
 
 
-        public static string ReadLevelCode()
+        private void ReadLevelCode(object sender, RoutedEventArgs e)
         {
             string test = "empty lol";
-
-            GetBaseAddresses();
-
-            Process myProcess = Process.GetProcessesByName("MCC-Win64-Shipping")[0];
-            IntPtr processHandle = OpenProcess(PROCESS_WM_READ, false, myProcess.Id);
-
-            
-            byte[] buffer = new byte[3];
-            //get levelname from loaded cp instead
-            IntPtr baseaddy = Globals.halo1dll + 0x0224D1D8;
-            int[] offsets = { 0x28, 0x23 };
-            ReadProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offsets), buffer, buffer.Length, out int bytesRead);
-            test = (Encoding.ASCII.GetString(buffer) + " (" + bytesRead.ToString() + "bytes)");
-            CloseHandle(processHandle);
+            if (Convert.ToBoolean(radioH1.IsChecked))
+            {
 
 
+                GetBaseAddresses();
+
+                Process myProcess = Process.GetProcessesByName("MCC-Win64-Shipping")[0];
+                IntPtr processHandle = OpenProcess(PROCESS_WM_READ, false, myProcess.Id);
 
 
-            /*  ProcessModule myProcessModule;
-              ProcessModuleCollection myProcessModuleCollection = myProcess.Modules;
-              Console.WriteLine("Base addresses of the modules associated "
-                  + "with 'mcc' are:");
-              // Display the 'BaseAddress' of each of the modules.
-              for (int i = 0; i < myProcessModuleCollection.Count; i++)
-              {
-                  myProcessModule = myProcessModuleCollection[i];
-                  Console.WriteLine(myProcessModule.ModuleName + " : "
-                      + myProcessModule.BaseAddress);
-              }*/
+                byte[] buffer = new byte[3];
+                //get levelname from loaded cp instead
+                IntPtr baseaddy = Globals.halo1dll + 0x0224D1D8;
+                int[] offsets = { 0x28, 0x23 };
+                ReadProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offsets), buffer, buffer.Length, out int bytesRead);
+                test = (Encoding.ASCII.GetString(buffer) + " (" + bytesRead.ToString() + "bytes)");
+                CloseHandle(processHandle);
 
 
 
-            return test;
+
+                /*  ProcessModule myProcessModule;
+                  ProcessModuleCollection myProcessModuleCollection = myProcess.Modules;
+                  Console.WriteLine("Base addresses of the modules associated "
+                      + "with 'mcc' are:");
+                  // Display the 'BaseAddress' of each of the modules.
+                  for (int i = 0; i < myProcessModuleCollection.Count; i++)
+                  {
+                      myProcessModule = myProcessModuleCollection[i];
+                      Console.WriteLine(myProcessModule.ModuleName + " : "
+                          + myProcessModule.BaseAddress);
+                  }*/
+
+
+
+                
+            }
+            else if (Convert.ToBoolean(radioH2.IsChecked))
+            {
+
+                GetBaseAddresses();
+
+                Process myProcess = Process.GetProcessesByName("MCC-Win64-Shipping")[0];
+                IntPtr processHandle = OpenProcess(PROCESS_WM_READ, false, myProcess.Id);
+
+
+                byte[] buffer = new byte[3];
+                //get levelname from loaded cp instead
+                IntPtr baseaddy = Globals.halo2dll + 0x062ADBE8;
+                int[] offsets = { 0x17 };
+                ReadProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offsets), buffer, buffer.Length, out int bytesRead);
+                test = (Encoding.ASCII.GetString(buffer) + " (" + bytesRead.ToString() + "bytes)");
+                CloseHandle(processHandle);
+
+
+
+
+                /*  ProcessModule myProcessModule;
+                  ProcessModuleCollection myProcessModuleCollection = myProcess.Modules;
+                  Console.WriteLine("Base addresses of the modules associated "
+                      + "with 'mcc' are:");
+                  // Display the 'BaseAddress' of each of the modules.
+                  for (int i = 0; i < myProcessModuleCollection.Count; i++)
+                  {
+                      myProcessModule = myProcessModuleCollection[i];
+                      Console.WriteLine(myProcessModule.ModuleName + " : "
+                          + myProcessModule.BaseAddress);
+                  }*/
+
+
+
+               
+            }
+            Console.WriteLine("levelcode: " + test);
         }
 
 
-        private void DumpH1CP_Click(object sender, RoutedEventArgs e)
+        private void DumpCP_Click(object sender, RoutedEventArgs e)
         {
-            Console.WriteLine("DUMPING CP");
+            //check which game is selected and call dat function
+            if (Convert.ToBoolean(radioH1.IsChecked))
+            {
+                H1Dump(sender, e);
+            }
+            else if (Convert.ToBoolean(radioH2.IsChecked))
+            {
+                H2Dump(sender, e);
+            }
+
+
+        }
+
+
+        private void InjectCP_Click(object sender, RoutedEventArgs e)
+        {
+            //check which game is selected and call dat function
+            //check which game is selected and call dat function
+            if (Convert.ToBoolean(radioH1.IsChecked))
+            {
+                H1Inject(sender, e);
+            }
+            else if (Convert.ToBoolean(radioH2.IsChecked))
+            {
+                H2Inject(sender, e);
+            }
+
+        }
+
+
+
+        private void H1Dump(object sender, RoutedEventArgs e)
+        {
+
+            Console.WriteLine("DUMPING H1 CP");
             GetBaseAddresses();
 
-            Process myProcess = Process.GetProcessesByName("MCC-Win64-Shipping")[0];
-            IntPtr processHandle = OpenProcess(PROCESS_WM_READ, false, myProcess.Id);
+        Process myProcess = Process.GetProcessesByName("MCC-Win64-Shipping")[0];
+        IntPtr processHandle = OpenProcess(PROCESS_WM_READ, false, myProcess.Id);
 
 
-            byte[] buffer = new byte[4956160];
-            //get levelname from loaded cp instead
-            IntPtr baseaddy = Globals.halo1dll + 0x0224D1D8;
-            int[] offsets = { 0x28, 0x14 };
+        byte[] buffer = new byte[4956160];
+        //get levelname from loaded cp instead
+        IntPtr baseaddy = Globals.halo1dll + 0x0224D1D8;
+        int[] offsets = { 0x28, 0x14 };
 
             if (ReadProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offsets), buffer, buffer.Length, out int bytesRead))
             {
@@ -190,20 +265,117 @@ namespace TestingRW
                 FileInfo test = new FileInfo(hardcodedpath);
                 if (File.Exists(test.ToString()) && test.Length > 1000)
                 {
-                    Console.WriteLine("SUCESSFULLY DUMPED CP, LENGTH: " + test.Length.ToString());
+                    Console.WriteLine("SUCESSFULLY DUMPED H1 CP, LENGTH: " + test.Length.ToString());
+                }
+            }
+            else
+                throw new Win32Exception();
+        CloseHandle(processHandle);
+        
+        
+        
+        }
+
+
+
+        private void H2Dump(object sender, RoutedEventArgs e)
+        {
+
+            Console.WriteLine("DUMPING H2 CP");
+            GetBaseAddresses();
+
+            Process myProcess = Process.GetProcessesByName("MCC-Win64-Shipping")[0];
+            IntPtr processHandle = OpenProcess(PROCESS_WM_READ, false, myProcess.Id);
+
+
+            byte[] buffer = new byte[4186112];
+            IntPtr baseaddy = Globals.halo2dll + 0x062ADBE8;
+            int[] offset = new int[1];
+            if (Convert.ToBoolean(radioCP1.IsChecked))
+            {
+                offset[0] =   0x0 ; //first cp
+            }
+            else
+            {
+                offset[0] =  0x3FE000 ; //second cp
+            }
+
+            if (ReadProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offset), buffer, buffer.Length, out int bytesRead))
+            {
+                File.WriteAllBytes(hardcodedpath, buffer);
+                FileInfo test = new FileInfo(hardcodedpath);
+                if (File.Exists(test.ToString()) && test.Length > 1000)
+                {
+                    Console.WriteLine("SUCESSFULLY DUMPED H2 CP, LENGTH: " + test.Length.ToString());
                 }
             }
             else
                 throw new Win32Exception();
             CloseHandle(processHandle);
+
+
+
         }
 
 
-        private void InjectH1CP_Click(object sender, RoutedEventArgs e)
+        private void H2Inject(object sender, RoutedEventArgs e)
         {
+
             if (File.Exists(hardcodedpath))
             {
-                Console.WriteLine("Injecting CP");
+                Console.WriteLine("Injecting H2 CP");
+                GetBaseAddresses();
+
+                Process myProcess = Process.GetProcessesByName("MCC-Win64-Shipping")[0];
+                IntPtr processHandle = OpenProcess(PROCESS_ALL_ACCESS, false, myProcess.Id);
+
+                string filename = hardcodedpath;
+                FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read);
+                // Create a byte array of file stream length
+                byte[] buffer = System.IO.File.ReadAllBytes(filename);
+                //Read block of bytes from stream into the byte array
+                fs.Read(buffer, 0, System.Convert.ToInt32(fs.Length));
+                //Close the File Stream
+                fs.Close();
+                Console.WriteLine("ready to inject, buffer length: " + buffer.Length.ToString());
+
+               
+                IntPtr baseaddy = Globals.halo2dll + 0x062ADBE8;
+                int[] offset = new int[1];
+                if (Convert.ToBoolean(radioCP1.IsChecked))
+                {
+                    offset[0] = 0x0; //first cp
+                }
+                else
+                {
+                    offset[0] = 0x3FE000; //second cp
+                }
+
+
+                if (WriteProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offset), buffer, buffer.Length, out int bytesWritten))
+                {
+                    Console.WriteLine("Successfully injected H2 CP, bytes written: " + bytesWritten.ToString());
+                }
+                else
+                    throw new Win32Exception();
+
+                CloseHandle(processHandle);
+
+            }
+            else
+                Console.WriteLine("file doesn't exist you silly");
+
+
+        }
+
+
+
+        private void H1Inject(object sender, RoutedEventArgs e)
+        {
+
+            if (File.Exists(hardcodedpath))
+            {
+                Console.WriteLine("Injecting H1 CP");
                 GetBaseAddresses();
 
                 Process myProcess = Process.GetProcessesByName("MCC-Win64-Shipping")[0];
@@ -226,7 +398,7 @@ namespace TestingRW
 
                 if (WriteProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offsets), buffer, buffer.Length, out int bytesWritten))
                 {
-                    Console.WriteLine("Successfully injected CP, bytes written: " + bytesWritten.ToString());
+                    Console.WriteLine("Successfully injected H1 CP, bytes written: " + bytesWritten.ToString());
                 }
                 else
                     throw new Win32Exception();
@@ -236,8 +408,9 @@ namespace TestingRW
             }
             else
                 Console.WriteLine("file doesn't exist you silly");
-            }
 
+
+        }
 
 
         public static IntPtr FindPointerAddy(IntPtr hProc, IntPtr ptr, int[] offsets)

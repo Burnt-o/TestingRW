@@ -7,8 +7,15 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <Button x:Name="DumpH1CP" Content="DumpH1CP" HorizontalAlignment="Left" Height="96" Margin="67,62,0,0" VerticalAlignment="Top" Width="179" Click="DumpH1CP_Click"/>
-        <Button Content="InjectH1CP" HorizontalAlignment="Left" Height="99" Margin="409,70,0,0" VerticalAlignment="Top" Width="246" Click="InjectH1CP_Click"/>
+        <Button x:Name="DumpCP" Content="DumpCP" HorizontalAlignment="Left" Height="96" Margin="67,62,0,0" VerticalAlignment="Top" Width="179" Click="DumpCP_Click"/>
+        <Button Content="InjectCP" HorizontalAlignment="Left" Height="99" Margin="409,70,0,0" VerticalAlignment="Top" Width="246" Click="InjectCP_Click"/>
+        <RadioButton x:Name="radioH1" GroupName="Game" Content="Halo 1" HorizontalAlignment="Left" Height="40" Margin="97,252,0,0" VerticalAlignment="Top" Width="66" IsChecked="True"/>
+        <RadioButton x:Name="radioH2" GroupName="Game" Content="Halo 2" HorizontalAlignment="Left" Height="40" Margin="196,252,0,0" VerticalAlignment="Top" Width="66"/>
+
+        <RadioButton x:Name="radioCP1" GroupName="CP" Content="CP 1" HorizontalAlignment="Left" Height="40" Margin="97,352,0,0" VerticalAlignment="Top" Width="66" IsChecked="True"/>
+        <RadioButton x:Name="radioCP2" GroupName="CP" Content="CP 2" HorizontalAlignment="Left" Height="40" Margin="196,352,0,0" VerticalAlignment="Top" Width="66"/>
+        <Label Content="&lt;-- Doesn't apply to H1" HorizontalAlignment="Left" Height="28" Margin="267,346,0,0" VerticalAlignment="Top" Width="246"/>
+        <Button Content="readlevelcode" HorizontalAlignment="Left" Height="54" Margin="578,252,0,0" VerticalAlignment="Top" Width="93" Click="ReadLevelCode"/>
 
     </Grid>
 </Window>
