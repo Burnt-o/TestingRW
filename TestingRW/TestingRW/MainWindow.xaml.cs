@@ -37,6 +37,7 @@ namespace TestingRW
         {
             public static System.IntPtr halo1dll;
             public static System.IntPtr halo2dll;
+            public static System.IntPtr halo3dll;
             public static System.IntPtr MCCexe;
 
         }
@@ -107,6 +108,11 @@ namespace TestingRW
 
                     case "halo2.dll":
                         Globals.halo2dll = myProcessModule.BaseAddress;
+                        Console.WriteLine(myProcessModule.ModuleName + " : " + myProcessModule.BaseAddress);
+                        break;
+
+                    case "halo3.dll":
+                        Globals.halo3dll = myProcessModule.BaseAddress;
                         Console.WriteLine(myProcessModule.ModuleName + " : " + myProcessModule.BaseAddress);
                         break;
 
@@ -207,6 +213,42 @@ namespace TestingRW
 
                
             }
+            else if (Convert.ToBoolean(radioH3.IsChecked))
+            {
+
+                GetBaseAddresses();
+
+                Process myProcess = Process.GetProcessesByName("MCC-Win64-Shipping")[0];
+                IntPtr processHandle = OpenProcess(PROCESS_WM_READ, false, myProcess.Id);
+
+
+                byte[] buffer = new byte[3];
+                //get levelname from loaded cp instead
+                IntPtr baseaddy = Globals.halo3dll + 0x00E71750;
+                int[] offsets = { -0x7DFFE4 };
+                ReadProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offsets), buffer, buffer.Length, out int bytesRead);
+                test = (Encoding.ASCII.GetString(buffer) + " (" + bytesRead.ToString() + "bytes)");
+                CloseHandle(processHandle);
+
+
+
+
+                /*  ProcessModule myProcessModule;
+                  ProcessModuleCollection myProcessModuleCollection = myProcess.Modules;
+                  Console.WriteLine("Base addresses of the modules associated "
+                      + "with 'mcc' are:");
+                  // Display the 'BaseAddress' of each of the modules.
+                  for (int i = 0; i < myProcessModuleCollection.Count; i++)
+                  {
+                      myProcessModule = myProcessModuleCollection[i];
+                      Console.WriteLine(myProcessModule.ModuleName + " : "
+                          + myProcessModule.BaseAddress);
+                  }*/
+
+
+
+
+            }
             Console.WriteLine("levelcode: " + test);
         }
 
@@ -222,7 +264,10 @@ namespace TestingRW
             {
                 H2Dump(sender, e);
             }
-
+            else if (Convert.ToBoolean(radioH3.IsChecked))
+            {
+                H3Dump(sender, e);
+            }
 
         }
 
@@ -238,6 +283,10 @@ namespace TestingRW
             else if (Convert.ToBoolean(radioH2.IsChecked))
             {
                 H2Inject(sender, e);
+            }
+            else if (Convert.ToBoolean(radioH3.IsChecked))
+            {
+                H3Inject(sender, e);
             }
 
         }
@@ -367,6 +416,99 @@ namespace TestingRW
 
 
         }
+
+
+
+        private void H3Dump(object sender, RoutedEventArgs e)
+        {
+
+            Console.WriteLine("DUMPING H3 CP");
+            GetBaseAddresses();
+
+            Process myProcess = Process.GetProcessesByName("MCC-Win64-Shipping")[0];
+            IntPtr processHandle = OpenProcess(PROCESS_WM_READ, false, myProcess.Id);
+
+
+            byte[] buffer = new byte[8257536];
+            IntPtr baseaddy = Globals.halo3dll + 0x00E71750;
+            int[] offset = new int[1];
+            if (Convert.ToBoolean(radioCP1.IsChecked))
+            {
+                offset[0] = -0x7E0000; //first cp
+            }
+            else
+            {
+                offset[0] = 0x0; //second cp
+            }
+
+            if (ReadProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offset), buffer, buffer.Length, out int bytesRead))
+            {
+                File.WriteAllBytes(hardcodedpath, buffer);
+                FileInfo test = new FileInfo(hardcodedpath);
+                if (File.Exists(test.ToString()) && test.Length > 1000)
+                {
+                    Console.WriteLine("SUCESSFULLY DUMPED H3 CP, LENGTH: " + test.Length.ToString());
+                }
+            }
+            else
+                throw new Win32Exception();
+            CloseHandle(processHandle);
+
+
+
+        }
+
+
+        private void H3Inject(object sender, RoutedEventArgs e)
+        {
+
+            if (File.Exists(hardcodedpath))
+            {
+                Console.WriteLine("Injecting H3 CP");
+                GetBaseAddresses();
+
+                Process myProcess = Process.GetProcessesByName("MCC-Win64-Shipping")[0];
+                IntPtr processHandle = OpenProcess(PROCESS_ALL_ACCESS, false, myProcess.Id);
+
+                string filename = hardcodedpath;
+                FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read);
+                // Create a byte array of file stream length
+                byte[] buffer = System.IO.File.ReadAllBytes(filename);
+                //Read block of bytes from stream into the byte array
+                fs.Read(buffer, 0, System.Convert.ToInt32(fs.Length));
+                //Close the File Stream
+                fs.Close();
+                Console.WriteLine("ready to inject, buffer length: " + buffer.Length.ToString());
+
+
+                IntPtr baseaddy = Globals.halo3dll + 0x00E71750;
+                int[] offset = new int[1];
+                if (Convert.ToBoolean(radioCP1.IsChecked))
+                {
+                    offset[0] = -0x7E0000; //first cp
+                }
+                else
+                {
+                    offset[0] = 0x0; //second cp
+                }
+
+
+                if (WriteProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offset), buffer, buffer.Length, out int bytesWritten))
+                {
+                    Console.WriteLine("Successfully injected H3 CP, bytes written: " + bytesWritten.ToString());
+                }
+                else
+                    throw new Win32Exception();
+
+                CloseHandle(processHandle);
+
+            }
+            else
+                Console.WriteLine("file doesn't exist you silly");
+
+
+        }
+
 
 
 
