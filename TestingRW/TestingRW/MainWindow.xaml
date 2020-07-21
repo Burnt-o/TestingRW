@@ -16,6 +16,7 @@
         <RadioButton x:Name="radioCP2" GroupName="CP" Content="CP 2" HorizontalAlignment="Left" Height="40" Margin="196,352,0,0" VerticalAlignment="Top" Width="66"/>
         <Label Content="&lt;-- Doesn't apply to H1" HorizontalAlignment="Left" Height="28" Margin="267,346,0,0" VerticalAlignment="Top" Width="246"/>
         <Button Content="readlevelcode" HorizontalAlignment="Left" Height="54" Margin="578,252,0,0" VerticalAlignment="Top" Width="93" Click="ReadLevelCode"/>
+        <RadioButton x:Name="radioHR" GroupName="Game" Content="Halo Reach" HorizontalAlignment="Left" Height="40" Margin="359,252,0,0" VerticalAlignment="Top" Width="92"/>
 
 
     </Grid>
