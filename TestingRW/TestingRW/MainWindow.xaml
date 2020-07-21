@@ -9,14 +9,30 @@
     <Grid>
         <Button x:Name="DumpCP" Content="DumpCP" HorizontalAlignment="Left" Height="96" Margin="67,62,0,0" VerticalAlignment="Top" Width="179" Click="DumpCP_Click"/>
         <Button Content="InjectCP" HorizontalAlignment="Left" Height="99" Margin="409,70,0,0" VerticalAlignment="Top" Width="246" Click="InjectCP_Click"/>
-        <RadioButton x:Name="radioH1" GroupName="Game" Content="Halo 1" HorizontalAlignment="Left" Height="40" Margin="97,252,0,0" VerticalAlignment="Top" Width="66" IsChecked="True"/>
-        <RadioButton x:Name="radioH2" GroupName="Game" Content="Halo 2" HorizontalAlignment="Left" Height="40" Margin="196,252,0,0" VerticalAlignment="Top" Width="66"/>
-        <RadioButton x:Name="radioH3" GroupName="Game" Content="Halo 3" HorizontalAlignment="Left" Height="40" Margin="288,252,0,0" VerticalAlignment="Top" Width="66"/>
-        <RadioButton x:Name="radioCP1" GroupName="CP" Content="CP 1" HorizontalAlignment="Left" Height="40" Margin="97,352,0,0" VerticalAlignment="Top" Width="66" IsChecked="True"/>
-        <RadioButton x:Name="radioCP2" GroupName="CP" Content="CP 2" HorizontalAlignment="Left" Height="40" Margin="196,352,0,0" VerticalAlignment="Top" Width="66"/>
-        <Label Content="&lt;-- Doesn't apply to H1" HorizontalAlignment="Left" Height="28" Margin="267,346,0,0" VerticalAlignment="Top" Width="246"/>
-        <Button Content="readlevelcode" HorizontalAlignment="Left" Height="54" Margin="578,252,0,0" VerticalAlignment="Top" Width="93" Click="ReadLevelCode"/>
-        <RadioButton x:Name="radioHR" GroupName="Game" Content="Halo Reach" HorizontalAlignment="Left" Height="40" Margin="359,252,0,0" VerticalAlignment="Top" Width="92"/>
+        <Button x:Name="ReadCodeDebug" Content="readlevelcode" HorizontalAlignment="Left" Height="54" Margin="578,252,0,0" VerticalAlignment="Top" Width="93" Click="ReadLevelCode" />
+        <TextBox x:Name="ChosenFilename" HorizontalAlignment="Left" Height="26" Margin="38,270,0,0" TextWrapping="Wrap" Text="InsertNameHere" VerticalAlignment="Top" Width="230"/>
+        <Label Content="File name of dumped CP" HorizontalAlignment="Left" Height="23" Margin="38,242,0,0" VerticalAlignment="Top" Width="192"/>
+
+        <Label Content="Folder to dump CP's to:" HorizontalAlignment="Left" Margin="17,168,0,0" VerticalAlignment="Top"/>
+        <Button Content="Browse" HorizontalAlignment="Left" Margin="17,199,0,0" VerticalAlignment="Top" Width="46" RenderTransformOrigin="2.444,0.187" Click="DumpBrowseClick" />
+        <TextBox x:Name="ChosenDump" HorizontalAlignment="Left" Height="20" Margin="67,199,0,0" TextWrapping="Wrap" Text="No Folder chosen!" VerticalAlignment="Top" Width="287"/>
+        <Label Content="CP file to inject:" HorizontalAlignment="Left" Margin="17,325,0,0" VerticalAlignment="Top"/>
+        <Button Content="Browse" HorizontalAlignment="Left" Margin="17,356,0,0" VerticalAlignment="Top" Width="46" RenderTransformOrigin="2.444,0.187" Click="InjectBrowseClick" />
+        <TextBox x:Name="ChosenInject" HorizontalAlignment="Left" Height="20" Margin="67,356,0,0" TextWrapping="Wrap" Text="No File chosen!" VerticalAlignment="Top" Width="287"/>
+        <Label  x:Name ="Log" Content="Log: " HorizontalAlignment="Left" Height="48" Margin="320,305,0,0" VerticalAlignment="Top" Width="415" RenderTransformOrigin="0.5,0.5">
+            <Label.Effect>
+                <DropShadowEffect/>
+            </Label.Effect>
+            <Label.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform Angle="4.374"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Label.RenderTransform>
+        </Label>
+        <Label Content="(for debugging)" HorizontalAlignment="Left" Height="39" Margin="671,288,0,0" VerticalAlignment="Top" Width="93"/>
 
 
     </Grid>
