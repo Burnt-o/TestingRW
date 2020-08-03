@@ -264,7 +264,7 @@ namespace TestingRW
 
                 byte[] buffer = new byte[3];
                 //get levelname from loaded cp instead
-                IntPtr baseaddy = Globals.halo1dll + 0x0224D1D8;
+                IntPtr baseaddy = Globals.halo1dll + 0x0224C1D8;
                 int[] offsets = { 0x28, 0x23 };
                 ReadProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offsets), buffer, buffer.Length, out int bytesRead);
                 test = (Encoding.ASCII.GetString(buffer) + " (" + bytesRead.ToString() + "bytes)");
@@ -471,7 +471,7 @@ namespace TestingRW
 
         byte[] buffer = new byte[4956160];
         //get levelname from loaded cp instead
-        IntPtr baseaddy = Globals.halo1dll + 0x0224D1D8;
+        IntPtr baseaddy = Globals.halo1dll + 0x0224C1D8;
         int[] offsets = { 0x28, 0x14 };
 
             if (ReadProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offsets), buffer, buffer.Length, out int bytesRead))
@@ -519,7 +519,7 @@ namespace TestingRW
                 Console.WriteLine("ready to inject, buffer length: " + buffer.Length.ToString());
 
                 //get levelname from loaded cp instead
-                IntPtr baseaddy = Globals.halo1dll + 0x0224D1D8;
+                IntPtr baseaddy = Globals.halo1dll + 0x0224C1D8;
                 int[] offsets = { 0x28, 0x14 };
 
 
