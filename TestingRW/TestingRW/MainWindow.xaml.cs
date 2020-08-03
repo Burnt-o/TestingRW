@@ -628,6 +628,30 @@ namespace TestingRW
                 Console.WriteLine("ready to inject, buffer length: " + buffer.Length.ToString());
 
 
+
+
+                //need to replace session id of buffered checkpoint
+                //first let's GET the session id
+
+                byte[] IDbuffer = new byte[8];
+                IntPtr IDbaseaddy = Globals.halo2dll + 0xDF0014;
+
+
+                if (ReadProcessMemory(processHandle, IDbaseaddy, IDbuffer, IDbuffer.Length, out int IDbytesRead))
+                {
+                    Console.WriteLine("Sucessfully got h2 cp ID");
+                }
+                else
+                    throw new Win32Exception();
+
+                //now need to go into file buffer and replace the bytes
+                for (int i=0; i<IDbuffer.Length; i++)
+                {
+                    buffer[0x4D1C + i] = IDbuffer[i];
+                }
+
+
+
                 bool DRflag;
                 byte[] DRbuffer = new byte[1];
                 IntPtr DRbaseaddy = Globals.halo2dll + 0xDEFB04;
