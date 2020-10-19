@@ -5,10 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TestingRW"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="Prototype HCM" Height="412" Width="800">
+    <Grid Margin="0,0,0,30">
         <Button x:Name="DumpCP" Content="DumpCP" HorizontalAlignment="Left" Height="96" Margin="67,62,0,0" VerticalAlignment="Top" Width="179" Click="DumpCP_Click"/>
-        <Button Content="InjectCP" HorizontalAlignment="Left" Height="99" Margin="409,70,0,0" VerticalAlignment="Top" Width="246" Click="InjectCP_Click"/>
+        <Button Content="InjectCP" HorizontalAlignment="Left" Height="99" Margin="411,59,0,0" VerticalAlignment="Top" Width="246" Click="InjectCP_Click"/>
         <Button x:Name="ReadCodeDebug" Content="readlevelcode" HorizontalAlignment="Left" Height="54" Margin="578,252,0,0" VerticalAlignment="Top" Width="93" Click="ReadLevelCode" />
         <TextBox x:Name="ChosenFilename" HorizontalAlignment="Left" Height="26" Margin="38,270,0,0" TextWrapping="Wrap" Text="InsertNameHere" VerticalAlignment="Top" Width="230"/>
         <Label Content="File name of dumped CP" HorizontalAlignment="Left" Height="23" Margin="38,242,0,0" VerticalAlignment="Top" Width="192"/>
@@ -16,9 +16,9 @@
         <Label Content="Folder to dump CP's to:" HorizontalAlignment="Left" Margin="17,168,0,0" VerticalAlignment="Top"/>
         <Button Content="Browse" HorizontalAlignment="Left" Margin="17,199,0,0" VerticalAlignment="Top" Width="46" RenderTransformOrigin="2.444,0.187" Click="DumpBrowseClick" />
         <TextBox x:Name="ChosenDump" HorizontalAlignment="Left" Height="20" Margin="67,199,0,0" TextWrapping="Wrap" Text="No Folder chosen!" VerticalAlignment="Top" Width="287"/>
-        <Label Content="CP file to inject:" HorizontalAlignment="Left" Margin="17,325,0,0" VerticalAlignment="Top"/>
-        <Button Content="Browse" HorizontalAlignment="Left" Margin="17,356,0,0" VerticalAlignment="Top" Width="46" RenderTransformOrigin="2.444,0.187" Click="InjectBrowseClick" />
-        <TextBox x:Name="ChosenInject" HorizontalAlignment="Left" Height="20" Margin="67,356,0,0" TextWrapping="Wrap" Text="No File chosen!" VerticalAlignment="Top" Width="287"/>
+        <Label Content="CP file to inject:" HorizontalAlignment="Left" Margin="392,168,0,0" VerticalAlignment="Top"/>
+        <Button Content="Browse" HorizontalAlignment="Left" Margin="392,199,0,0" VerticalAlignment="Top" Width="46" RenderTransformOrigin="2.444,0.187" Click="InjectBrowseClick" />
+        <TextBox x:Name="ChosenInject" HorizontalAlignment="Left" Height="20" Margin="442,199,0,0" TextWrapping="Wrap" Text="No File chosen!" VerticalAlignment="Top" Width="287"/>
         <Label  x:Name ="Log" Content="Log: " HorizontalAlignment="Left" Height="48" Margin="320,305,0,0" VerticalAlignment="Top" Width="415" RenderTransformOrigin="0.5,0.5">
             <Label.Effect>
                 <DropShadowEffect/>
@@ -33,6 +33,7 @@
             </Label.RenderTransform>
         </Label>
         <Label Content="(for debugging)" HorizontalAlignment="Left" Height="39" Margin="671,288,0,0" VerticalAlignment="Top" Width="93"/>
+        <Label Content="Reach-Only prototype for mcc 1.1864.0.0 (steam only)" HorizontalAlignment="Left" Height="31" Margin="76,10,0,0" VerticalAlignment="Top" Width="360"/>
 
 
     </Grid>

@@ -42,6 +42,10 @@ namespace TestingRW
             public static System.IntPtr haloreachdll;
             public static System.IntPtr MCCexe;
 
+            public static int gameindicator = 0x038F5A00;
+
+            public static int haloreachDRflag = 0x259DACC;
+            public static int haloreachCPaddy = 0x2839810;
 
         }
 
@@ -200,7 +204,7 @@ namespace TestingRW
             IntPtr processHandle = OpenProcess(PROCESS_WM_READ, false, myProcess.Id);
 
             byte[] buffer = new byte[1];
-            IntPtr baseaddy = Globals.MCCexe + 0x038E4BD0;
+            IntPtr baseaddy = Globals.MCCexe + Globals.gameindicator;
             int[] offset = { 0x0 };
 
             if (ReadProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offset), buffer, buffer.Length, out int DRbytesRead))
@@ -250,11 +254,11 @@ namespace TestingRW
 
         private void ReadLevelCode(object sender, RoutedEventArgs e)
         {
-            string test = "empty lol";
+            string test = "unsupported game! hr only for now";
             string loadedgame = CheckGame(sender, e);
             if (loadedgame == "halo 1")
             {
-
+                return; //unsupporting non hr for now
 
                 GetBaseAddresses();
 
@@ -273,25 +277,11 @@ namespace TestingRW
 
 
 
-                /*  ProcessModule myProcessModule;
-                  ProcessModuleCollection myProcessModuleCollection = myProcess.Modules;
-                  Console.WriteLine("Base addresses of the modules associated "
-                      + "with 'mcc' are:");
-                  // Display the 'BaseAddress' of each of the modules.
-                  for (int i = 0; i < myProcessModuleCollection.Count; i++)
-                  {
-                      myProcessModule = myProcessModuleCollection[i];
-                      Console.WriteLine(myProcessModule.ModuleName + " : "
-                          + myProcessModule.BaseAddress);
-                  }*/
 
-
-
-                
             }
             else if (loadedgame == "halo 2")
             {
-
+                return; //unsupporting non hr for now
                 GetBaseAddresses();
 
                 Process myProcess = Process.GetProcessesByName("MCC-Win64-Shipping")[0];
@@ -323,11 +313,11 @@ namespace TestingRW
 
 
 
-               
+
             }
             else if (loadedgame == "halo 3")
             {
-
+                return; //unsupporting non hr for now
                 GetBaseAddresses();
 
                 Process myProcess = Process.GetProcessesByName("MCC-Win64-Shipping")[0];
@@ -372,7 +362,7 @@ namespace TestingRW
 
                 byte[] buffer = new byte[3];
                 //get levelname from loaded cp instead
-                IntPtr baseaddy = Globals.haloreachdll + 0x0279F780;
+                IntPtr baseaddy = Globals.haloreachdll + Globals.haloreachCPaddy;
                 int[] offsets = { -0xA0FFEC };
                 ReadProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offsets), buffer, buffer.Length, out int bytesRead);
                 test = (Encoding.ASCII.GetString(buffer) + " (" + bytesRead.ToString() + "bytes)");
@@ -397,6 +387,10 @@ namespace TestingRW
 
 
             }
+            else
+            {
+                return; //unsupporting non hr for now
+            }
             Log.Content = "Log: " + loadedgame + " levelcode " + test;
             Console.WriteLine("levelcode: " + test);
         }
@@ -408,15 +402,15 @@ namespace TestingRW
             //check which game is selected and call dat function
             if (loadedgame == "halo 1")
             {
-                H1Dump(sender, e);
+                //H1Dump(sender, e);
             }
             else if (loadedgame == "halo 2")
             {
-                H2Dump(sender, e);
+                //H2Dump(sender, e);
             }
             else if (loadedgame == "halo 3")
             {
-                H3Dump(sender, e);
+                //H3Dump(sender, e);
             }
             else if (loadedgame == "halo reach")
             {
@@ -432,15 +426,15 @@ namespace TestingRW
             string loadedgame = CheckGame(sender, e);
             if (loadedgame == "halo 1")
             {
-                H1Inject(sender, e);
+                //H1Inject(sender, e);
             }
             else if (loadedgame == "halo 2")
             {
-                H2Inject(sender, e);
+                //H2Inject(sender, e);
             }
             else if (loadedgame == "halo 3")
             {
-                H3Inject(sender, e);
+                //H3Inject(sender, e);
             }
             else if (loadedgame == "halo reach")
             {
@@ -853,7 +847,7 @@ namespace TestingRW
 
             bool DRflag;
             byte[] DRbuffer = new byte[1];
-            IntPtr DRbaseaddy = Globals.haloreachdll + 0x250626C;
+            IntPtr DRbaseaddy = Globals.haloreachdll + Globals.haloreachDRflag;
 
             if (ReadProcessMemory(processHandle, DRbaseaddy, DRbuffer, DRbuffer.Length, out int DRbytesRead))
             {
@@ -866,7 +860,7 @@ namespace TestingRW
 
 
             byte[] buffer = new byte[10551296];
-            IntPtr baseaddy = Globals.haloreachdll + 0x0279F780;
+            IntPtr baseaddy = Globals.haloreachdll + Globals.haloreachCPaddy;
             int[] offset = new int[1];
             if (!DRflag)
             {
@@ -922,7 +916,7 @@ namespace TestingRW
 
                 bool DRflag;
                 byte[] DRbuffer = new byte[1];
-                IntPtr DRbaseaddy = Globals.haloreachdll + 0x250626C;
+                IntPtr DRbaseaddy = Globals.haloreachdll + Globals.haloreachDRflag;
 
                 if (ReadProcessMemory(processHandle, DRbaseaddy, DRbuffer, DRbuffer.Length, out int DRbytesRead))
                 {
@@ -933,7 +927,7 @@ namespace TestingRW
 
 
 
-                IntPtr baseaddy = Globals.haloreachdll + 0x0279F780;
+                IntPtr baseaddy = Globals.haloreachdll + Globals.haloreachCPaddy;
                 int[] offset = new int[1];
                 if (!DRflag)
                 {
