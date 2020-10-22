@@ -314,6 +314,27 @@ namespace TestingRW
             IntPtr processHandle;
             //yes yes shouldn't use exceptions as control flow but lazy
             //need to make this better in proper HCM
+
+            //the only part that REALLY needs the try-catch is OpenProcess
+            //that or i could just check if the process exists first but eh could still have access issues. 
+            //actually yeah should still do it so I can popup warning about needing to run as admin
+
+
+            //so code should be
+
+/*
+            check if process exists
+            check if our global process id matches it's id
+            if so do nothing (we're attached) (well actually proceed to next checks but eh)
+            if not (but process exists)
+            then try opening it and setting global process id etc
+            catch - failed to open - popup warning about needing admin priv + mcc eac off. then do nothing (not attached)
+            if process didn't exist
+            do nothing (not attached)
+
+
+*/
+
             try
             {
                 Process testProcess = Process.GetProcessById(Globals.ProcessID);
