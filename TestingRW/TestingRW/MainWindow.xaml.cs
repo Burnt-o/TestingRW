@@ -24,6 +24,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.ComponentModel;
 using System.Windows.Forms;
+using System.Windows.Threading;
 
 namespace TestingRW
 {
@@ -46,6 +47,7 @@ namespace TestingRW
 
             public static int haloreachDRflag = 0x259DACC;
             public static int haloreachCPaddy = 0x2839810;
+            public static int haloreachSeedAddy = 0x1119E18;
 
         }
 
@@ -89,10 +91,58 @@ namespace TestingRW
             //Console.WriteLine("test: " + ReadLevelCode());
             //System.Windows.Application.Current.Shutdown();
 
+            DispatcherTimer dtClockTime = new DispatcherTimer();
+
+            dtClockTime.Interval = new TimeSpan(0, 0, 1); //in Hour, Minutes, Second.
+            dtClockTime.Tick += dtClockTime_Tick;
+
+            dtClockTime.Start();
+
+
+
+
 
             this.Title = "Prototype HCM";
 
         }
+
+        private void dtClockTime_Tick(object sender, EventArgs e)
+        {
+
+            try
+            {
+                Console.WriteLine("Getting level start seed");
+                GetBaseAddresses();
+
+                Process myProcess = Process.GetProcessesByName("MCC-Win64-Shipping")[0];
+                IntPtr processHandle = OpenProcess(PROCESS_WM_READ, false, myProcess.Id);
+
+
+                uint seedint;
+                byte[] seedbuffer = new byte[4];
+                IntPtr seedbaseaddy = Globals.haloreachdll + Globals.haloreachSeedAddy;
+
+                if (ReadProcessMemory(processHandle, seedbaseaddy, seedbuffer, seedbuffer.Length, out int DRbytesRead))
+                {
+
+                    seedint = BitConverter.ToUInt32(seedbuffer, 0);
+
+
+
+                    Seed.Content = "Level Start Seed: " + (Convert.ToString(seedint, 16)).ToUpper();
+                }
+                else
+                    //throw new Win32Exception();
+                    Seed.Content = "Level Start Seed: Error";
+                Console.WriteLine("Error getting level start seed");
+            }
+            catch {
+                Seed.Content = "Level Start Seed: Error 2";
+                Console.WriteLine("Error getting level start seed 2");
+            }
+
+        }
+
 
 
         private void DumpBrowseClick(object sender, RoutedEventArgs e)
@@ -140,6 +190,7 @@ namespace TestingRW
 
         public static void GetBaseAddresses()
         {
+            
             Process myProcess = Process.GetProcessesByName("MCC-Win64-Shipping")[0];
             IntPtr processHandle = OpenProcess(PROCESS_WM_READ, false, myProcess.Id);
             ProcessModule myProcessModule;

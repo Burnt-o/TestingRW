@@ -34,6 +34,7 @@
         </Label>
         <Label Content="(for debugging)" HorizontalAlignment="Left" Height="39" Margin="671,288,0,0" VerticalAlignment="Top" Width="93"/>
         <Label Content="Reach-Only prototype for mcc 1.1864.0.0 (steam only)" HorizontalAlignment="Left" Height="31" Margin="76,10,0,0" VerticalAlignment="Top" Width="360"/>
+        <Label x:Name ="Seed" Content="Level Start Seed: " HorizontalAlignment="Left" Height="31" Margin="459,10,0,0" VerticalAlignment="Top" Width="225"/>
 
 
     </Grid>
