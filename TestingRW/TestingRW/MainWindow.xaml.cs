@@ -49,6 +49,9 @@ namespace TestingRW
             public static int haloreachCPaddy = 0x2839810;
             public static int haloreachSeedAddy = 0x1119E18;
 
+            public static Int32 ProcessID;
+            public static IntPtr GlobalProcessHandle;
+
         }
 
 
@@ -73,6 +76,9 @@ namespace TestingRW
 
         [DllImport("kernel32.dll")]
         public static extern Int32 CloseHandle(IntPtr hProcess);
+
+        [DllImport("kernel32.dll")]
+        static extern bool GetHandleInformation(IntPtr hObject, out uint lpdwFlags);
 
 
 
@@ -302,6 +308,49 @@ namespace TestingRW
         
         }
 
+        private void DebugClick(object sender, RoutedEventArgs e)
+        {
+
+            IntPtr processHandle;
+            //yes yes shouldn't use exceptions as control flow but lazy
+            //need to make this better in proper HCM
+            try
+            {
+                Process testProcess = Process.GetProcessById(Globals.ProcessID);
+                if (testProcess.ProcessName == "MCC-Win64-Shipping")
+                {
+                    Log.Content = "MCC already attached at " + (Convert.ToString(Globals.ProcessID, 16)).ToUpper();
+                }
+                else
+                {
+                    throw new Exception("blah");
+                }
+                
+            }
+            catch
+            {
+                try
+                {
+                    Process myProcess = Process.GetProcessesByName("MCC-Win64-Shipping")[0];
+                    processHandle = OpenProcess(PROCESS_WM_READ, false, myProcess.Id);
+                    Globals.ProcessID = myProcess.Id;
+                    Globals.GlobalProcessHandle = processHandle;
+                    Log.Content = "MCC found with ID " + (Convert.ToString(myProcess.Id, 16)).ToUpper();
+                }
+                catch
+                {
+                    Log.Content = "MCC not found";
+                    return;
+                }
+            }
+            //let's check if we can check whether the process is open
+           
+            
+
+
+        
+        }
+
 
         private void ReadLevelCode(object sender, RoutedEventArgs e)
         {
@@ -324,7 +373,7 @@ namespace TestingRW
                 ReadProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offsets), buffer, buffer.Length, out int bytesRead);
                 test = (Encoding.ASCII.GetString(buffer) + " (" + bytesRead.ToString() + "bytes)");
                 CloseHandle(processHandle);
-
+                
 
 
 
@@ -407,8 +456,7 @@ namespace TestingRW
 
                 GetBaseAddresses();
 
-                Process myProcess = Process.GetProcessesByName("MCC-Win64-Shipping")[0];
-                IntPtr processHandle = OpenProcess(PROCESS_WM_READ, false, myProcess.Id);
+                IntPtr processHandle = Globals.GlobalProcessHandle;
 
 
                 byte[] buffer = new byte[3];
@@ -417,7 +465,7 @@ namespace TestingRW
                 int[] offsets = { -0xA0FFEC };
                 ReadProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offsets), buffer, buffer.Length, out int bytesRead);
                 test = (Encoding.ASCII.GetString(buffer) + " (" + bytesRead.ToString() + "bytes)");
-                CloseHandle(processHandle);
+                //CloseHandle(processHandle);
 
 
 
