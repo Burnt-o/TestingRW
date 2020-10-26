@@ -975,8 +975,6 @@ namespace TestingRW
             }
             else
                 throw new Win32Exception();
-  
-
 
 
             byte[] buffer = new byte[10551296];
@@ -1046,6 +1044,34 @@ namespace TestingRW
                     throw new Win32Exception();
 
 
+                //need to read and store player int
+                int numberofbytestopaste = 84;
+
+
+                byte[] buffer2 = new byte[numberofbytestopaste];
+                IntPtr baseaddy2 = Globals.haloreachdll + Globals.haloreachCPaddy;
+                int[] offset2 = new int[1];
+                if (!DRflag)
+                {
+                    offset2[0] = -0xA10000 + 0x594A74; //first cp
+                }
+                else
+                {
+                    offset2[0] = 0x0 + 0x594A74; //second cp
+                }
+
+                if (ReadProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy2, offset2), buffer2, buffer2.Length, out int bytesRead))
+                {
+                    Console.WriteLine("Successfully read hr playerint" + buffer2[0].ToString() + buffer2[1].ToString() + buffer2[2].ToString() + buffer2[3].ToString());
+                    //Log.Content = "Successfully read hr playerint";
+                }
+                else
+                    throw new Win32Exception();
+
+
+
+                /////
+
 
                 IntPtr baseaddy = Globals.haloreachdll + Globals.haloreachCPaddy;
                 int[] offset = new int[1];
@@ -1065,6 +1091,15 @@ namespace TestingRW
                 }
                 else
                     throw new Win32Exception();
+
+                if (WriteProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offset2), buffer2, buffer2.Length, out int bytesWritten2))
+                {
+                    Console.WriteLine("Successfully pasted hr player int");
+                    //Log.Content = "Successfully pasted hr player int";
+                }
+                else
+                    throw new Win32Exception();
+
 
                 CloseHandle(processHandle);
 
