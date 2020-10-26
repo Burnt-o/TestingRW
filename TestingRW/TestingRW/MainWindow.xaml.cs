@@ -117,7 +117,7 @@ namespace TestingRW
 
             try
             {
-                Console.WriteLine("Getting level start seed");
+                //Console.WriteLine("Getting level start seed");
                 GetBaseAddresses();
 
                 Process myProcess = Process.GetProcessesByName("MCC-Win64-Shipping")[0];
@@ -140,11 +140,11 @@ namespace TestingRW
                 else
                     //throw new Win32Exception();
                     Seed.Content = "Level Start Seed: Error";
-                Console.WriteLine("Error getting level start seed");
+                //Console.WriteLine("Error getting level start seed");
             }
             catch {
                 Seed.Content = "Level Start Seed: Error 2";
-                Console.WriteLine("Error getting level start seed 2");
+                //Console.WriteLine("Error getting level start seed 2");
             }
 
         }
@@ -211,32 +211,32 @@ namespace TestingRW
                 {
                     case "halo1.dll":
                         Globals.halo1dll = myProcessModule.BaseAddress;
-                        Console.WriteLine(myProcessModule.ModuleName + " : " + myProcessModule.BaseAddress);
+                        //Console.WriteLine(myProcessModule.ModuleName + " : " + myProcessModule.BaseAddress);
                         break;
 
                     case "halo2.dll":
                         Globals.halo2dll = myProcessModule.BaseAddress;
-                        Console.WriteLine(myProcessModule.ModuleName + " : " + myProcessModule.BaseAddress);
+                        //Console.WriteLine(myProcessModule.ModuleName + " : " + myProcessModule.BaseAddress);
                         break;
 
                     case "halo3.dll":
                         Globals.halo3dll = myProcessModule.BaseAddress;
-                        Console.WriteLine(myProcessModule.ModuleName + " : " + myProcessModule.BaseAddress);
+                        //Console.WriteLine(myProcessModule.ModuleName + " : " + myProcessModule.BaseAddress);
                         break;
 
                     case "haloreach.dll":
                         Globals.haloreachdll = myProcessModule.BaseAddress;
-                        Console.WriteLine(myProcessModule.ModuleName + " : " + myProcessModule.BaseAddress);
+                        //Console.WriteLine(myProcessModule.ModuleName + " : " + myProcessModule.BaseAddress);
                         break;
 
                     case "MCC-Win64-Shipping.exe":
                         Globals.MCCexe = myProcessModule.BaseAddress;
-                        Console.WriteLine(myProcessModule.ModuleName + " : " + myProcessModule.BaseAddress);
+                        //Console.WriteLine(myProcessModule.ModuleName + " : " + myProcessModule.BaseAddress);
                         break;
 
                     case "MCC-Win64-Shipping-Winstore.exe":
                         Globals.MCCexe = myProcessModule.BaseAddress;
-                        Console.WriteLine(myProcessModule.ModuleName + " : " + myProcessModule.BaseAddress);
+                        //Console.WriteLine(myProcessModule.ModuleName + " : " + myProcessModule.BaseAddress);
                         break;
 
                     default:
@@ -1045,10 +1045,10 @@ namespace TestingRW
 
 
                 //need to read and store player int
-                int numberofbytestopaste = 84;
+                //int numberofbytestopaste = 84;
 
 
-                byte[] buffer2 = new byte[numberofbytestopaste];
+                byte[] buffer2 = new byte[4];
                 IntPtr baseaddy2 = Globals.haloreachdll + Globals.haloreachCPaddy;
                 int[] offset2 = new int[1];
                 if (!DRflag)
@@ -1068,6 +1068,25 @@ namespace TestingRW
                 else
                     throw new Win32Exception();
 
+                byte[] buffer5 = new byte[16];
+                IntPtr baseaddy5 = Globals.haloreachdll + Globals.haloreachCPaddy;
+                int[] offset5 = new int[1];
+                if (!DRflag)
+                {
+                    offset5[0] = -0xA10000 + 0x58F4F0; //first cp
+                }
+                else
+                {
+                    offset5[0] = 0x0 + 0x58F4F0; //second cp
+                }
+
+                if (ReadProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy5, offset5), buffer5, buffer5.Length, out int bytesRead5))
+                {
+                    Console.WriteLine("Successfully read hr playerint 2" + buffer5[0].ToString());
+                    //Log.Content = "Successfully read hr playerint";
+                }
+                else
+                    throw new Win32Exception();
 
 
                 /////
@@ -1100,6 +1119,45 @@ namespace TestingRW
                 else
                     throw new Win32Exception();
 
+                if (WriteProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offset5), buffer5, buffer5.Length, out int bytesWritten3))
+                {
+                    Console.WriteLine("Successfully pasted hr player int 2");
+                    //Log.Content = "Successfully pasted hr player int";
+                }
+                else
+                    throw new Win32Exception();
+
+                //binary search stuff, remove this for releases
+                /*
+                string hardcodesafepath = @"E:\scripts\moredumps\Burnt_WCstart.bin";
+                if (File.Exists(hardcodesafepath))
+                { Console.WriteLine("well the file is valid"); }
+                FileStream fs3 = new FileStream(hardcodesafepath, FileMode.Open, FileAccess.Read);
+                // Create a byte array of file stream length
+                byte[] buffer3 = System.IO.File.ReadAllBytes(hardcodesafepath);
+                //Read block of bytes from stream into the byte array
+                fs3.Read(buffer3, 0, System.Convert.ToInt32(fs3.Length));
+                //Close the File Stream
+                fs3.Close();
+
+                int startoffset = int.Parse(Startoffset.Text, System.Globalization.NumberStyles.HexNumber);
+                int endoffset = int.Parse(Endoffset.Text, System.Globalization.NumberStyles.HexNumber);
+                Console.Write("parsing correct? A: " + startoffset);
+                Console.Write("parsing correct? B: " + endoffset);
+
+                Console.WriteLine("length of new buffer4; " + Convert.ToString(endoffset - startoffset, 16));
+                var buffer4 = new byte[endoffset - startoffset];
+                Array.Copy(buffer3, startoffset, buffer4, 0, endoffset - startoffset);
+
+                offset[0] = offset[0] + startoffset;
+                if (WriteProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offset), buffer4, buffer4.Length, out int bytesWritten3))
+                {
+                    Console.WriteLine("successfully pasted binary search thing from: " + Startoffset.Text + " to " + Endoffset.Text);
+                    Log.Content = "Log: HR: Successfully injected " + "\\" + Path.GetFileName(path) + " with clean from " + Startoffset.Text + " to " + Endoffset.Text;
+                }
+                else
+                    throw new Win32Exception();
+*/
 
                 CloseHandle(processHandle);
 
