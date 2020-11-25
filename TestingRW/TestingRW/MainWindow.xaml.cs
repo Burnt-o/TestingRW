@@ -51,6 +51,8 @@ namespace TestingRW
 
             public static int halo2DRflag = 0xdf0b04;
             public static int halo2CPaddy = 0x01412EF8;
+            public static int halo2bspbyteA = 0xDF1DE8;
+            public static int halo2bspbyteB = 0xDF3108;
 
             public static int halo3DRflag = 0x1C5DF48;
             public static int halo3CPaddy = 0x01DB5B40;
@@ -727,6 +729,51 @@ namespace TestingRW
 
 
 
+                byte[] buffer2 = new byte[8];
+                IntPtr baseaddy2 = Globals.halo2dll + Globals.halo2CPaddy;
+                int[] offset2 = new int[1];
+                if (!DRflag)
+                {
+                    offset2[0] = 0x0 + 0x4D1C; //first cp
+                }
+                else
+                {
+                    offset2[0] = 0x3FE000 + 0x4D1C; //second cp
+                }
+
+                if (ReadProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy2, offset2), buffer2, buffer2.Length, out int bytesRead))
+                {
+                    Console.WriteLine("Successfully read h2 preserve val 1" + buffer2[0].ToString() + buffer2[1].ToString() + buffer2[2].ToString() + buffer2[3].ToString());
+                    //Log.Content = "Successfully read hr playerint";
+                }
+                else
+                    throw new Win32Exception();
+
+
+
+
+                //bsp manip
+                byte[] buffer6 = new byte[1];
+                buffer6[0] = buffer[0x12E0]; //read bsp from checkpoint file
+                IntPtr baseaddy6;
+                if (!DRflag)
+                {
+                    baseaddy6 = Globals.halo2dll + Globals.halo2bspbyteA; //first cp
+                }
+                else
+                {
+                    baseaddy6 = Globals.halo2dll + Globals.halo2bspbyteB; //second cp
+                }
+
+                if (WriteProcessMemory(processHandle, baseaddy6, buffer6, buffer6.Length, out int bytesWritten6)) //write it in so the game knows what bsp to load
+                {
+                    Console.WriteLine("Successfully pasted h2 bsp byte");
+                    //Log.Content = "Successfully pasted hr player int";
+                }
+                else
+                    throw new Win32Exception();
+
+
                 IntPtr baseaddy = Globals.halo2dll + Globals.halo2CPaddy;
                 int[] offset = new int[1];
                 if (!DRflag)
@@ -747,34 +794,61 @@ namespace TestingRW
                     throw new Win32Exception();
 
 
+
                 //binary search stuff, remove this for releases
-                /*
-                string hardcodesafepath = @"E:\scripts\moredumps\Burnt_WCstart.bin";
-                if (File.Exists(hardcodesafepath))
-                { Console.WriteLine("well the file is valid"); }
-                FileStream fs3 = new FileStream(hardcodesafepath, FileMode.Open, FileAccess.Read);
-                // Create a byte array of file stream length
-                byte[] buffer3 = System.IO.File.ReadAllBytes(hardcodesafepath);
-                //Read block of bytes from stream into the byte array
-                fs3.Read(buffer3, 0, System.Convert.ToInt32(fs3.Length));
-                //Close the File Stream
-                fs3.Close();
-                int startoffset = int.Parse(Startoffset.Text, System.Globalization.NumberStyles.HexNumber);
-                int endoffset = int.Parse(Endoffset.Text, System.Globalization.NumberStyles.HexNumber);
-                Console.Write("parsing correct? A: " + startoffset);
-                Console.Write("parsing correct? B: " + endoffset);
-                Console.WriteLine("length of new buffer4; " + Convert.ToString(endoffset - startoffset, 16));
-                var buffer4 = new byte[endoffset - startoffset];
-                Array.Copy(buffer3, startoffset, buffer4, 0, endoffset - startoffset);
-                offset[0] = offset[0] + startoffset;
-                if (WriteProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offset), buffer4, buffer4.Length, out int bytesWritten3))
+                if (Startoffset.Text != "ignore")
                 {
-                    Console.WriteLine("successfully pasted binary search thing from: " + Startoffset.Text + " to " + Endoffset.Text);
-                    Log.Content = "Log: HR: Successfully injected " + "\\" + Path.GetFileName(path) + " with clean from " + Startoffset.Text + " to " + Endoffset.Text;
+                    string hardcodesafepath = @"B:\HaloFiles\hcm h2\cleanreproducibles\run3.bin";
+                    if (File.Exists(hardcodesafepath))
+                    { Console.WriteLine("well the file is valid"); }
+                    FileStream fs3 = new FileStream(hardcodesafepath, FileMode.Open, FileAccess.Read);
+                    // Create a byte array of file stream length
+                    byte[] buffer3 = System.IO.File.ReadAllBytes(hardcodesafepath);
+                    //Read block of bytes from stream into the byte array
+                    fs3.Read(buffer3, 0, System.Convert.ToInt32(fs3.Length));
+                    //Close the File Stream
+                    fs3.Close();
+                    int startoffset = int.Parse(Startoffset.Text, System.Globalization.NumberStyles.HexNumber);
+                    int endoffset = int.Parse(Endoffset.Text, System.Globalization.NumberStyles.HexNumber);
+                    Console.Write("parsing correct? A: " + startoffset);
+                    Console.Write("parsing correct? B: " + endoffset);
+                    Console.WriteLine("length of new buffer4; " + Convert.ToString(endoffset - startoffset, 16));
+                    var buffer4 = new byte[endoffset - startoffset];
+                    Array.Copy(buffer3, startoffset, buffer4, 0, endoffset - startoffset);
+                    offset[0] = offset[0] + startoffset;
+                    if (WriteProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offset), buffer4, buffer4.Length, out int bytesWritten3))
+                    {
+                        Console.WriteLine("successfully pasted binary search thing from: " + Startoffset.Text + " to " + Endoffset.Text);
+                        Log.Content = "Log: HR: Successfully injected " + "\\" + Path.GetFileName(path) + " with dirty from " + Startoffset.Text + " to " + Endoffset.Text;
+                    }
+                    else
+                        throw new Win32Exception();
                 }
-                else
-                    throw new Win32Exception();
-*/
+
+
+                //int[] preserveme = { 0x50C, 0x595, 0x5A8, 0x1b74, 0x1bfd, 0x1c10, 0x2bbc, 0x4da5 };
+                int[] preserveme = { 0x2bbc, 0x4D1C };
+                //preserveme = null;
+                int[] offsethold = new int[1];
+                if (preserveme != null)
+                { 
+                foreach (int i in preserveme)
+                {
+                    offsethold[0] = offset[0] + i;
+                    if (WriteProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offsethold), buffer2, buffer2.Length, out bytesWritten))
+                    {
+                        Console.WriteLine("Successfully pasted h2 preserved value repeat: " + i.ToString());
+                        //Log.Content = "Successfully pasted hr player int";
+                    }
+                    else
+                        throw new Win32Exception();
+                }
+                }
+
+
+
+
+
 
                 CloseHandle(processHandle);
 
@@ -907,33 +981,34 @@ namespace TestingRW
 
 
                 //binary search stuff, remove this for releases
-                /*
-                string hardcodesafepath = @"E:\scripts\moredumps\Burnt_WCstart.bin";
-                if (File.Exists(hardcodesafepath))
-                { Console.WriteLine("well the file is valid"); }
-                FileStream fs3 = new FileStream(hardcodesafepath, FileMode.Open, FileAccess.Read);
-                // Create a byte array of file stream length
-                byte[] buffer3 = System.IO.File.ReadAllBytes(hardcodesafepath);
-                //Read block of bytes from stream into the byte array
-                fs3.Read(buffer3, 0, System.Convert.ToInt32(fs3.Length));
-                //Close the File Stream
-                fs3.Close();
-                int startoffset = int.Parse(Startoffset.Text, System.Globalization.NumberStyles.HexNumber);
-                int endoffset = int.Parse(Endoffset.Text, System.Globalization.NumberStyles.HexNumber);
-                Console.Write("parsing correct? A: " + startoffset);
-                Console.Write("parsing correct? B: " + endoffset);
-                Console.WriteLine("length of new buffer4; " + Convert.ToString(endoffset - startoffset, 16));
-                var buffer4 = new byte[endoffset - startoffset];
-                Array.Copy(buffer3, startoffset, buffer4, 0, endoffset - startoffset);
-                offset[0] = offset[0] + startoffset;
-                if (WriteProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offset), buffer4, buffer4.Length, out int bytesWritten3))
+                if (Startoffset.Text != "ignore")
                 {
-                    Console.WriteLine("successfully pasted binary search thing from: " + Startoffset.Text + " to " + Endoffset.Text);
-                    Log.Content = "Log: HR: Successfully injected " + "\\" + Path.GetFileName(path) + " with clean from " + Startoffset.Text + " to " + Endoffset.Text;
+                    string hardcodesafepath = @"B:\HaloFiles\hcm h3\cleanreproducibles\Sorix_ArkKnown.bin";
+                    if (File.Exists(hardcodesafepath))
+                    { Console.WriteLine("well the file is valid"); }
+                    FileStream fs3 = new FileStream(hardcodesafepath, FileMode.Open, FileAccess.Read);
+                    // Create a byte array of file stream length
+                    byte[] buffer3 = System.IO.File.ReadAllBytes(hardcodesafepath);
+                    //Read block of bytes from stream into the byte array
+                    fs3.Read(buffer3, 0, System.Convert.ToInt32(fs3.Length));
+                    //Close the File Stream
+                    fs3.Close();
+                    int startoffset = int.Parse(Startoffset.Text, System.Globalization.NumberStyles.HexNumber);
+                    int endoffset = int.Parse(Endoffset.Text, System.Globalization.NumberStyles.HexNumber);
+                    Console.Write("parsing correct? A: " + startoffset);
+                    Console.Write("parsing correct? B: " + endoffset);
+                    Console.WriteLine("length of new buffer4; " + Convert.ToString(endoffset - startoffset, 16));
+                    var buffer4 = new byte[endoffset - startoffset];
+                    Array.Copy(buffer3, startoffset, buffer4, 0, endoffset - startoffset);
+                    offset[0] = offset[0] + startoffset;
+                    if (WriteProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offset), buffer4, buffer4.Length, out int bytesWritten3))
+                    {
+                        Console.WriteLine("successfully pasted binary search thing from: " + Startoffset.Text + " to " + Endoffset.Text);
+                        Log.Content = "Log: H3: Successfully injected " + "\\" + Path.GetFileName(path) + " with dirty from " + Startoffset.Text + " to " + Endoffset.Text;
+                    }
+                    else
+                        throw new Win32Exception();
                 }
-                else
-                    throw new Win32Exception();
-*/
 
                 CloseHandle(processHandle);
 
