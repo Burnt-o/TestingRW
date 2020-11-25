@@ -33,7 +33,7 @@
             </Label.RenderTransform>
         </Label>
         <Label Content="(for debugging)" HorizontalAlignment="Left" Height="39" Margin="671,288,0,0" VerticalAlignment="Top" Width="93"/>
-        <Label Content="Reach-Only prototype for mcc 1.1864.0.0 (steam only)" HorizontalAlignment="Left" Height="31" Margin="76,10,0,0" VerticalAlignment="Top" Width="360"/>
+        <Label Content="H2 and H3 prototype for mcc 1.1955.0.0 (steam only)" HorizontalAlignment="Left" Height="31" Margin="76,10,0,0" VerticalAlignment="Top" Width="360"/>
         <Label x:Name ="Seed" Content="Level Start Seed: " HorizontalAlignment="Left" Height="31" Margin="459,10,0,0" VerticalAlignment="Top" Width="225"/>
         <Button  Content="debug" HorizontalAlignment="Left" Height="30" Margin="700,235,0,0" VerticalAlignment="Top" Width="76" Click="DebugClick"/>
         <TextBox x:Name ="Startoffset" HorizontalAlignment="Left" Height="23" Margin="689,31,0,0" TextWrapping="Wrap" Text="ignore" VerticalAlignment="Top" Width="75" IsEnabled="false"/>

@@ -43,11 +43,17 @@ namespace TestingRW
             public static System.IntPtr haloreachdll;
             public static System.IntPtr MCCexe;
 
-            public static int gameindicator = 0x038F5A00;
+            public static int gameindicator = 0x038E7CC8;
 
             public static int haloreachDRflag = 0x259DACC;
             public static int haloreachCPaddy = 0x2839810;
-            public static int haloreachSeedAddy = 0x1119E18;
+           public static int haloreachSeedAddy = 0x1119E18;
+
+            public static int halo2DRflag = 0xdf0b04;
+            public static int halo2CPaddy = 0x01412EF8;
+
+            public static int halo3DRflag = 0x1C5DF48;
+            public static int halo3CPaddy = 0x01DB5B40;
 
             public static Int32 ProcessID;
             public static IntPtr GlobalProcessHandle;
@@ -99,10 +105,10 @@ namespace TestingRW
 
             DispatcherTimer dtClockTime = new DispatcherTimer();
 
-            dtClockTime.Interval = new TimeSpan(0, 0, 1); //in Hour, Minutes, Second.
-            dtClockTime.Tick += dtClockTime_Tick;
+            //dtClockTime.Interval = new TimeSpan(0, 0, 1); //in Hour, Minutes, Second.
+            //dtClockTime.Tick += dtClockTime_Tick;
 
-            dtClockTime.Start();
+            //dtClockTime.Start();
 
 
 
@@ -115,37 +121,7 @@ namespace TestingRW
         private void dtClockTime_Tick(object sender, EventArgs e)
         {
 
-            try
-            {
-                //Console.WriteLine("Getting level start seed");
-                GetBaseAddresses();
-
-                Process myProcess = Process.GetProcessesByName("MCC-Win64-Shipping")[0];
-                IntPtr processHandle = OpenProcess(PROCESS_WM_READ, false, myProcess.Id);
-
-
-                uint seedint;
-                byte[] seedbuffer = new byte[4];
-                IntPtr seedbaseaddy = Globals.haloreachdll + Globals.haloreachSeedAddy;
-
-                if (ReadProcessMemory(processHandle, seedbaseaddy, seedbuffer, seedbuffer.Length, out int DRbytesRead))
-                {
-
-                    seedint = BitConverter.ToUInt32(seedbuffer, 0);
-
-
-
-                    Seed.Content = "Level Start Seed: " + (Convert.ToString(seedint, 16)).ToUpper();
-                }
-                else
-                    //throw new Win32Exception();
-                    Seed.Content = "Level Start Seed: Error";
-                //Console.WriteLine("Error getting level start seed");
-            }
-            catch {
-                Seed.Content = "Level Start Seed: Error 2";
-                //Console.WriteLine("Error getting level start seed 2");
-            }
+           
 
         }
 
@@ -196,7 +172,7 @@ namespace TestingRW
 
         public static void GetBaseAddresses()
         {
-            
+
             Process myProcess = Process.GetProcessesByName("MCC-Win64-Shipping")[0];
             IntPtr processHandle = OpenProcess(PROCESS_WM_READ, false, myProcess.Id);
             ProcessModule myProcessModule;
@@ -292,7 +268,7 @@ namespace TestingRW
 
                     default:
                         break;
-                
+
                 }
             }
             else
@@ -304,8 +280,8 @@ namespace TestingRW
 
 
             return loadedgame;
-        
-        
+
+
         }
 
         private void DebugClick(object sender, RoutedEventArgs e)
@@ -322,18 +298,16 @@ namespace TestingRW
 
             //so code should be
 
-/*
-            check if process exists
-            check if our global process id matches it's id
-            if so do nothing (we're attached) (well actually proceed to next checks but eh)
-            if not (but process exists)
-            then try opening it and setting global process id etc
-            catch - failed to open - popup warning about needing admin priv + mcc eac off. then do nothing (not attached)
-            if process didn't exist
-            do nothing (not attached)
-
-
-*/
+            /*
+                        check if process exists
+                        check if our global process id matches it's id
+                        if so do nothing (we're attached) (well actually proceed to next checks but eh)
+                        if not (but process exists)
+                        then try opening it and setting global process id etc
+                        catch - failed to open - popup warning about needing admin priv + mcc eac off. then do nothing (not attached)
+                        if process didn't exist
+                        do nothing (not attached)
+            */
 
             try
             {
@@ -346,7 +320,7 @@ namespace TestingRW
                 {
                     throw new Exception("blah");
                 }
-                
+
             }
             catch
             {
@@ -365,11 +339,11 @@ namespace TestingRW
                 }
             }
             //let's check if we can check whether the process is open
-           
-            
 
 
-        
+
+
+
         }
 
 
@@ -394,7 +368,7 @@ namespace TestingRW
                 ReadProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offsets), buffer, buffer.Length, out int bytesRead);
                 test = (Encoding.ASCII.GetString(buffer) + " (" + bytesRead.ToString() + "bytes)");
                 CloseHandle(processHandle);
-                
+
 
 
 
@@ -402,7 +376,7 @@ namespace TestingRW
             }
             else if (loadedgame == "halo 2")
             {
-                return; //unsupporting non hr for now
+               
                 GetBaseAddresses();
 
                 Process myProcess = Process.GetProcessesByName("MCC-Win64-Shipping")[0];
@@ -410,10 +384,8 @@ namespace TestingRW
 
 
                 byte[] buffer = new byte[3];
-                //get levelname from loaded cp instead
-                IntPtr baseaddy = Globals.halo2dll + 0x062ADBE8;
-                int[] offsets = { 0x17 };
-                ReadProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offsets), buffer, buffer.Length, out int bytesRead);
+                IntPtr baseaddy = Globals.halo2dll + 0xE34303;
+                ReadProcessMemory(processHandle, baseaddy, buffer, buffer.Length, out int bytesRead);
                 test = (Encoding.ASCII.GetString(buffer) + " (" + bytesRead.ToString() + "bytes)");
                 CloseHandle(processHandle);
 
@@ -438,7 +410,7 @@ namespace TestingRW
             }
             else if (loadedgame == "halo 3")
             {
-                return; //unsupporting non hr for now
+                //unsupporting non hr for now
                 GetBaseAddresses();
 
                 Process myProcess = Process.GetProcessesByName("MCC-Win64-Shipping")[0];
@@ -447,9 +419,8 @@ namespace TestingRW
 
                 byte[] buffer = new byte[3];
                 //get levelname from loaded cp instead
-                IntPtr baseaddy = Globals.halo3dll + 0x00E71750;
-                int[] offsets = { -0x7DFFE4 };
-                ReadProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offsets), buffer, buffer.Length, out int bytesRead);
+                IntPtr baseaddy = Globals.halo3dll + 0x1D4F22B;
+                ReadProcessMemory(processHandle, baseaddy, buffer, buffer.Length, out int bytesRead);
                 test = (Encoding.ASCII.GetString(buffer) + " (" + bytesRead.ToString() + "bytes)");
                 CloseHandle(processHandle);
 
@@ -474,7 +445,7 @@ namespace TestingRW
             }
             else if (loadedgame == "halo reach")
             {
-
+                return;
                 GetBaseAddresses();
 
                 IntPtr processHandle = Globals.GlobalProcessHandle;
@@ -482,10 +453,10 @@ namespace TestingRW
 
                 byte[] buffer = new byte[3];
                 //get levelname from loaded cp instead
-                IntPtr baseaddy = Globals.haloreachdll + Globals.haloreachCPaddy;
-                int[] offsets = { -0xA0FFEC };
-                ReadProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offsets), buffer, buffer.Length, out int bytesRead);
-                test = (Encoding.ASCII.GetString(buffer) + " (" + bytesRead.ToString() + "bytes)");
+                //IntPtr baseaddy = Globals.haloreachdll + Globals.haloreachCPaddy;
+                //int[] offsets = { -0xA0FFEC };
+                //ReadProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offsets), buffer, buffer.Length, out int bytesRead);
+                //test = (Encoding.ASCII.GetString(buffer) + " (" + bytesRead.ToString() + "bytes)");
                 //CloseHandle(processHandle);
 
 
@@ -526,15 +497,15 @@ namespace TestingRW
             }
             else if (loadedgame == "halo 2")
             {
-                //H2Dump(sender, e);
+                H2Dump(sender, e);
             }
             else if (loadedgame == "halo 3")
             {
-                //H3Dump(sender, e);
+                H3Dump(sender, e);
             }
             else if (loadedgame == "halo reach")
             {
-                HRDump(sender, e);
+                //HRDump(sender, e);
             }
 
         }
@@ -550,15 +521,15 @@ namespace TestingRW
             }
             else if (loadedgame == "halo 2")
             {
-                //H2Inject(sender, e);
+                H2Inject(sender, e);
             }
             else if (loadedgame == "halo 3")
             {
-                //H3Inject(sender, e);
+                H3Inject(sender, e);
             }
             else if (loadedgame == "halo reach")
             {
-                HRInject(sender, e);
+                //HRInject(sender, e);
             }
 
         }
@@ -579,14 +550,14 @@ namespace TestingRW
             Console.WriteLine("DUMPING H1 CP");
             GetBaseAddresses();
 
-        Process myProcess = Process.GetProcessesByName("MCC-Win64-Shipping")[0];
-        IntPtr processHandle = OpenProcess(PROCESS_WM_READ, false, myProcess.Id);
+            Process myProcess = Process.GetProcessesByName("MCC-Win64-Shipping")[0];
+            IntPtr processHandle = OpenProcess(PROCESS_WM_READ, false, myProcess.Id);
 
 
-        byte[] buffer = new byte[4956160];
-        //get levelname from loaded cp instead
-        IntPtr baseaddy = Globals.halo1dll + 0x0224C1D8;
-        int[] offsets = { 0x28, 0x14 };
+            byte[] buffer = new byte[4956160];
+            //get levelname from loaded cp instead
+            IntPtr baseaddy = Globals.halo1dll + 0x0224C1D8;
+            int[] offsets = { 0x28, 0x14 };
 
             if (ReadProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offsets), buffer, buffer.Length, out int bytesRead))
             {
@@ -600,10 +571,10 @@ namespace TestingRW
             }
             else
                 throw new Win32Exception();
-        CloseHandle(processHandle);
-        
-        
-        
+            CloseHandle(processHandle);
+
+
+
         }
 
 
@@ -676,9 +647,10 @@ namespace TestingRW
             Process myProcess = Process.GetProcessesByName("MCC-Win64-Shipping")[0];
             IntPtr processHandle = OpenProcess(PROCESS_WM_READ, false, myProcess.Id);
 
+
             bool DRflag;
             byte[] DRbuffer = new byte[1];
-            IntPtr DRbaseaddy = Globals.halo2dll + 0xDEFB04;
+            IntPtr DRbaseaddy = Globals.halo2dll + Globals.halo2DRflag;
 
             if (ReadProcessMemory(processHandle, DRbaseaddy, DRbuffer, DRbuffer.Length, out int DRbytesRead))
             {
@@ -689,15 +661,15 @@ namespace TestingRW
 
 
             byte[] buffer = new byte[4186112];
-            IntPtr baseaddy = Globals.halo2dll + 0x062ADBE8;
+            IntPtr baseaddy = Globals.halo2dll + Globals.halo2CPaddy;
             int[] offset = new int[1];
             if (!DRflag)
             {
-                offset[0] =   0x0 ; //first cp
+                offset[0] = 0x0; //first cp
             }
             else
             {
-                offset[0] =  0x3FE000 ; //second cp
+                offset[0] = 0x3FE000; //second cp
             }
 
             if (ReadProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offset), buffer, buffer.Length, out int bytesRead))
@@ -713,7 +685,6 @@ namespace TestingRW
             else
                 throw new Win32Exception();
             CloseHandle(processHandle);
-
 
 
         }
@@ -743,32 +714,9 @@ namespace TestingRW
 
 
 
-
-                //need to replace session id of buffered checkpoint
-                //first let's GET the session id
-
-                byte[] IDbuffer = new byte[8];
-                IntPtr IDbaseaddy = Globals.halo2dll + 0xDF0014;
-
-
-                if (ReadProcessMemory(processHandle, IDbaseaddy, IDbuffer, IDbuffer.Length, out int IDbytesRead))
-                {
-                    Console.WriteLine("Sucessfully got h2 cp ID");
-                }
-                else
-                    throw new Win32Exception();
-
-                //now need to go into file buffer and replace the bytes
-                for (int i=0; i<IDbuffer.Length; i++)
-                {
-                    buffer[0x4D1C + i] = IDbuffer[i];
-                }
-
-
-
                 bool DRflag;
                 byte[] DRbuffer = new byte[1];
-                IntPtr DRbaseaddy = Globals.halo2dll + 0xDEFB04;
+                IntPtr DRbaseaddy = Globals.halo2dll + Globals.halo2DRflag;
 
                 if (ReadProcessMemory(processHandle, DRbaseaddy, DRbuffer, DRbuffer.Length, out int DRbytesRead))
                 {
@@ -779,8 +727,7 @@ namespace TestingRW
 
 
 
-
-                IntPtr baseaddy = Globals.halo2dll + 0x062ADBE8;
+                IntPtr baseaddy = Globals.halo2dll + Globals.halo2CPaddy;
                 int[] offset = new int[1];
                 if (!DRflag)
                 {
@@ -791,7 +738,6 @@ namespace TestingRW
                     offset[0] = 0x3FE000; //second cp
                 }
 
-
                 if (WriteProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offset), buffer, buffer.Length, out int bytesWritten))
                 {
                     Console.WriteLine("Successfully injected H2 CP, bytes written: " + bytesWritten.ToString());
@@ -799,6 +745,36 @@ namespace TestingRW
                 }
                 else
                     throw new Win32Exception();
+
+
+                //binary search stuff, remove this for releases
+                /*
+                string hardcodesafepath = @"E:\scripts\moredumps\Burnt_WCstart.bin";
+                if (File.Exists(hardcodesafepath))
+                { Console.WriteLine("well the file is valid"); }
+                FileStream fs3 = new FileStream(hardcodesafepath, FileMode.Open, FileAccess.Read);
+                // Create a byte array of file stream length
+                byte[] buffer3 = System.IO.File.ReadAllBytes(hardcodesafepath);
+                //Read block of bytes from stream into the byte array
+                fs3.Read(buffer3, 0, System.Convert.ToInt32(fs3.Length));
+                //Close the File Stream
+                fs3.Close();
+                int startoffset = int.Parse(Startoffset.Text, System.Globalization.NumberStyles.HexNumber);
+                int endoffset = int.Parse(Endoffset.Text, System.Globalization.NumberStyles.HexNumber);
+                Console.Write("parsing correct? A: " + startoffset);
+                Console.Write("parsing correct? B: " + endoffset);
+                Console.WriteLine("length of new buffer4; " + Convert.ToString(endoffset - startoffset, 16));
+                var buffer4 = new byte[endoffset - startoffset];
+                Array.Copy(buffer3, startoffset, buffer4, 0, endoffset - startoffset);
+                offset[0] = offset[0] + startoffset;
+                if (WriteProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offset), buffer4, buffer4.Length, out int bytesWritten3))
+                {
+                    Console.WriteLine("successfully pasted binary search thing from: " + Startoffset.Text + " to " + Endoffset.Text);
+                    Log.Content = "Log: HR: Successfully injected " + "\\" + Path.GetFileName(path) + " with clean from " + Startoffset.Text + " to " + Endoffset.Text;
+                }
+                else
+                    throw new Win32Exception();
+*/
 
                 CloseHandle(processHandle);
 
@@ -808,7 +784,6 @@ namespace TestingRW
                 Console.WriteLine("file doesn't exist you silly");
                 System.Windows.MessageBox.Show("file doesn't exist you silly");
             }
-
 
         }
 
@@ -834,7 +809,7 @@ namespace TestingRW
 
             bool DRflag;
             byte[] DRbuffer = new byte[1];
-            IntPtr DRbaseaddy = Globals.halo3dll + 0xC371F8;
+            IntPtr DRbaseaddy = Globals.halo3dll + Globals.halo3DRflag;
 
             if (ReadProcessMemory(processHandle, DRbaseaddy, DRbuffer, DRbuffer.Length, out int DRbytesRead))
             {
@@ -844,17 +819,16 @@ namespace TestingRW
                 throw new Win32Exception();
 
 
-
             byte[] buffer = new byte[8257536];
-            IntPtr baseaddy = Globals.halo3dll + 0x00E71750;
+            IntPtr baseaddy = Globals.halo3dll + Globals.halo3CPaddy;
             int[] offset = new int[1];
             if (!DRflag)
             {
-                offset[0] = -0x7E0000; //first cp
+                offset[0] = 0x0; //first cp
             }
             else
             {
-                offset[0] = 0x0; //second cp
+                offset[0] = 0x7E0000; //second cp
             }
 
             if (ReadProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offset), buffer, buffer.Length, out int bytesRead))
@@ -872,13 +846,11 @@ namespace TestingRW
             CloseHandle(processHandle);
 
 
-
         }
 
 
         private void H3Inject(object sender, RoutedEventArgs e)
         {
-
             string path = ChosenInject.Text;
 
             if (File.Exists(path))
@@ -903,7 +875,7 @@ namespace TestingRW
 
                 bool DRflag;
                 byte[] DRbuffer = new byte[1];
-                IntPtr DRbaseaddy = Globals.halo3dll + 0xC371F8;
+                IntPtr DRbaseaddy = Globals.halo3dll + Globals.halo3DRflag;
 
                 if (ReadProcessMemory(processHandle, DRbaseaddy, DRbuffer, DRbuffer.Length, out int DRbytesRead))
                 {
@@ -914,17 +886,16 @@ namespace TestingRW
 
 
 
-                IntPtr baseaddy = Globals.halo3dll + 0x00E71750;
+                IntPtr baseaddy = Globals.halo3dll + Globals.halo3CPaddy;
                 int[] offset = new int[1];
                 if (!DRflag)
                 {
-                    offset[0] = -0x7E0000; //first cp
+                    offset[0] = 0x0; //first cp
                 }
                 else
                 {
-                    offset[0] = 0x0; //second cp
+                    offset[0] = 0x7E0000; //second cp
                 }
-
 
                 if (WriteProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offset), buffer, buffer.Length, out int bytesWritten))
                 {
@@ -933,6 +904,36 @@ namespace TestingRW
                 }
                 else
                     throw new Win32Exception();
+
+
+                //binary search stuff, remove this for releases
+                /*
+                string hardcodesafepath = @"E:\scripts\moredumps\Burnt_WCstart.bin";
+                if (File.Exists(hardcodesafepath))
+                { Console.WriteLine("well the file is valid"); }
+                FileStream fs3 = new FileStream(hardcodesafepath, FileMode.Open, FileAccess.Read);
+                // Create a byte array of file stream length
+                byte[] buffer3 = System.IO.File.ReadAllBytes(hardcodesafepath);
+                //Read block of bytes from stream into the byte array
+                fs3.Read(buffer3, 0, System.Convert.ToInt32(fs3.Length));
+                //Close the File Stream
+                fs3.Close();
+                int startoffset = int.Parse(Startoffset.Text, System.Globalization.NumberStyles.HexNumber);
+                int endoffset = int.Parse(Endoffset.Text, System.Globalization.NumberStyles.HexNumber);
+                Console.Write("parsing correct? A: " + startoffset);
+                Console.Write("parsing correct? B: " + endoffset);
+                Console.WriteLine("length of new buffer4; " + Convert.ToString(endoffset - startoffset, 16));
+                var buffer4 = new byte[endoffset - startoffset];
+                Array.Copy(buffer3, startoffset, buffer4, 0, endoffset - startoffset);
+                offset[0] = offset[0] + startoffset;
+                if (WriteProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offset), buffer4, buffer4.Length, out int bytesWritten3))
+                {
+                    Console.WriteLine("successfully pasted binary search thing from: " + Startoffset.Text + " to " + Endoffset.Text);
+                    Log.Content = "Log: HR: Successfully injected " + "\\" + Path.GetFileName(path) + " with clean from " + Startoffset.Text + " to " + Endoffset.Text;
+                }
+                else
+                    throw new Win32Exception();
+*/
 
                 CloseHandle(processHandle);
 
@@ -943,8 +944,8 @@ namespace TestingRW
                 System.Windows.MessageBox.Show("file doesn't exist you silly");
             }
 
-
         }
+
 
 
         private void HRDump(object sender, RoutedEventArgs e)
@@ -1139,16 +1140,13 @@ namespace TestingRW
                 fs3.Read(buffer3, 0, System.Convert.ToInt32(fs3.Length));
                 //Close the File Stream
                 fs3.Close();
-
                 int startoffset = int.Parse(Startoffset.Text, System.Globalization.NumberStyles.HexNumber);
                 int endoffset = int.Parse(Endoffset.Text, System.Globalization.NumberStyles.HexNumber);
                 Console.Write("parsing correct? A: " + startoffset);
                 Console.Write("parsing correct? B: " + endoffset);
-
                 Console.WriteLine("length of new buffer4; " + Convert.ToString(endoffset - startoffset, 16));
                 var buffer4 = new byte[endoffset - startoffset];
                 Array.Copy(buffer3, startoffset, buffer4, 0, endoffset - startoffset);
-
                 offset[0] = offset[0] + startoffset;
                 if (WriteProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offset), buffer4, buffer4.Length, out int bytesWritten3))
                 {
@@ -1171,7 +1169,7 @@ namespace TestingRW
 
         }
 
-// down here is where I put code I nicked from StackOverflow
+        // down here is where I put code I nicked from StackOverflow
 
         public static IntPtr FindPointerAddy(IntPtr hProc, IntPtr ptr, int[] offsets)
         {
