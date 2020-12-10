@@ -8,11 +8,11 @@
         Title="Prototype HCM" Height="412" Width="800">
     <Grid Margin="0,0,0,30">
         <Button x:Name="DumpCP" Content="DumpCP" HorizontalAlignment="Left" Height="96" Margin="67,62,0,0" VerticalAlignment="Top" Width="179" Click="DumpCP_Click"/>
-        <Button Content="InjectCP" HorizontalAlignment="Left" Height="99" Margin="411,59,0,0" VerticalAlignment="Top" Width="246" Click="InjectCP_Click"/>
+        <Button Content="InjectCP" HorizontalAlignment="Left" Height="99" Margin="411,59,0,0" VerticalAlignment="Top" Width="246" Click="InjectCP_Click" IsEnabled="false"/>
         <Button x:Name="ReadCodeDebug" Content="readlevelcode" HorizontalAlignment="Left" Height="54" Margin="578,252,0,0" VerticalAlignment="Top" Width="93" Click="ReadLevelCode" />
         <TextBox x:Name="ChosenFilename" HorizontalAlignment="Left" Height="26" Margin="38,270,0,0" TextWrapping="Wrap" Text="InsertNameHere" VerticalAlignment="Top" Width="230"/>
         <Label Content="File name of dumped CP" HorizontalAlignment="Left" Height="23" Margin="38,242,0,0" VerticalAlignment="Top" Width="192"/>
-
+        <Label Content="debug shit:" HorizontalAlignment="Left" Margin="665,5,0,0" VerticalAlignment="Top"/>
         <Label Content="Folder to dump CP's to:" HorizontalAlignment="Left" Margin="17,168,0,0" VerticalAlignment="Top"/>
         <Button Content="Browse" HorizontalAlignment="Left" Margin="17,199,0,0" VerticalAlignment="Top" Width="46" RenderTransformOrigin="2.444,0.187" Click="DumpBrowseClick" />
         <TextBox x:Name="ChosenDump" HorizontalAlignment="Left" Height="20" Margin="67,199,0,0" TextWrapping="Wrap" Text="No Folder chosen!" VerticalAlignment="Top" Width="287"/>
@@ -33,12 +33,12 @@
             </Label.RenderTransform>
         </Label>
         <Label Content="(for debugging)" HorizontalAlignment="Left" Height="39" Margin="671,288,0,0" VerticalAlignment="Top" Width="93"/>
-        <Label Content="H2 and H3 prototype for mcc 1.1955.0.0 (steam only)" HorizontalAlignment="Left" Height="31" Margin="76,10,0,0" VerticalAlignment="Top" Width="360"/>
+        <Label Content="ODST prototype for mcc 1.1955.0.0 (steam only)" HorizontalAlignment="Left" Height="31" Margin="76,10,0,0" VerticalAlignment="Top" Width="360"/>
         <Label x:Name ="Seed" Content="Level Start Seed: " HorizontalAlignment="Left" Height="31" Margin="459,10,0,0" VerticalAlignment="Top" Width="225"/>
         <Button  Content="debug" HorizontalAlignment="Left" Height="30" Margin="700,235,0,0" VerticalAlignment="Top" Width="76" Click="DebugClick"/>
-        <TextBox x:Name ="Startoffset" HorizontalAlignment="Left" Height="23" Margin="689,31,0,0" TextWrapping="Wrap" Text="ignore" VerticalAlignment="Top" Width="75" IsEnabled="true"/>
-        <TextBox x:Name ="Endoffset" HorizontalAlignment="Left" Height="23" Margin="689,62,0,0" TextWrapping="Wrap" Text="me" VerticalAlignment="Top" Width="75" IsEnabled="true"/>
-
+        <TextBox x:Name ="Startoffset" HorizontalAlignment="Left" Height="23" Margin="689,31,0,0" TextWrapping="Wrap" Text="ignore" VerticalAlignment="Top" Width="75" IsEnabled="false"/>
+        <TextBox x:Name ="Endoffset" HorizontalAlignment="Left" Height="23" Margin="689,62,0,0" TextWrapping="Wrap" Text="me" VerticalAlignment="Top" Width="75" IsEnabled="false"/>
+        <CheckBox  x:Name ="debugcheckbox" Content="" HorizontalAlignment="Left" Margin="739,11,-18,0" VerticalAlignment="Top" Checked="CheckBoxon" Unchecked="CheckBoxoff" IsEnabled="false" />
 
     </Grid>
 </Window>

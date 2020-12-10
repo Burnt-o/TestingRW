@@ -42,6 +42,7 @@ namespace TestingRW
             public static System.IntPtr halo2dll;
             public static System.IntPtr halo3dll;
             public static System.IntPtr haloreachdll;
+            public static System.IntPtr halo3odstdll;
             public static System.IntPtr MCCexe;
 
             public static int gameindicator = 0x038E7CC8;
@@ -57,6 +58,10 @@ namespace TestingRW
 
             public static int halo3DRflag = 0x1C5DF48;
             public static int halo3CPaddy = 0x01DB5B40;
+
+            public static int halo3odstCPaddy = 0x01D45750;
+            public static int halo3odstDRflag = 0x1C5AD68;
+            public static int halo3odstlevelname = 0xA4F2E5;
 
             public static Int32 ProcessID;
             public static IntPtr GlobalProcessHandle;
@@ -203,6 +208,11 @@ namespace TestingRW
                         //Console.WriteLine(myProcessModule.ModuleName + " : " + myProcessModule.BaseAddress);
                         break;
 
+                    case "halo3odst.dll":
+                        Globals.halo3odstdll = myProcessModule.BaseAddress;
+                        //Console.WriteLine(myProcessModule.ModuleName + " : " + myProcessModule.BaseAddress);
+                        break;
+
                     case "haloreach.dll":
                         Globals.haloreachdll = myProcessModule.BaseAddress;
                         //Console.WriteLine(myProcessModule.ModuleName + " : " + myProcessModule.BaseAddress);
@@ -262,6 +272,11 @@ namespace TestingRW
                         Console.WriteLine("game is halo 3");
                         break;
 
+
+                    case 5:
+                        loadedgame = "halo odst";
+                        Console.WriteLine("game is halo odst");
+                        break;
                     case 6:
                         loadedgame = "halo reach";
                         Console.WriteLine("game is halo reach");
@@ -481,6 +496,41 @@ namespace TestingRW
 
 
             }
+            else if (loadedgame == "halo odst")
+            {
+                //unsupporting non hr for now
+                GetBaseAddresses();
+
+                Process myProcess = Process.GetProcessesByName("MCC-Win64-Shipping")[0];
+                IntPtr processHandle = OpenProcess(PROCESS_WM_READ, false, myProcess.Id);
+
+
+                byte[] buffer = new byte[4];
+                //get levelname from loaded cp instead
+                IntPtr baseaddy = Globals.halo3odstdll + Globals.halo3odstlevelname;
+                ReadProcessMemory(processHandle, baseaddy, buffer, buffer.Length, out int bytesRead);
+                test = (Encoding.ASCII.GetString(buffer) + " (" + bytesRead.ToString() + "bytes)");
+                CloseHandle(processHandle);
+
+
+
+
+                /*  ProcessModule myProcessModule;
+                  ProcessModuleCollection myProcessModuleCollection = myProcess.Modules;
+                  Console.WriteLine("Base addresses of the modules associated "
+                      + "with 'mcc' are:");
+                  // Display the 'BaseAddress' of each of the modules.
+                  for (int i = 0; i < myProcessModuleCollection.Count; i++)
+                  {
+                      myProcessModule = myProcessModuleCollection[i];
+                      Console.WriteLine(myProcessModule.ModuleName + " : "
+                          + myProcessModule.BaseAddress);
+                  }*/
+
+
+
+
+            }
             else
             {
                 return; //unsupporting non hr for now
@@ -500,15 +550,19 @@ namespace TestingRW
             }
             else if (loadedgame == "halo 2")
             {
-                H2Dump(sender, e);
+                //H2Dump(sender, e);
             }
             else if (loadedgame == "halo 3")
             {
-                H3Dump(sender, e);
+                //H3Dump(sender, e);
             }
             else if (loadedgame == "halo reach")
             {
                 //HRDump(sender, e);
+            }
+            else if (loadedgame == "halo odst")
+            {
+                ODSTDump(sender, e);
             }
 
         }
@@ -524,15 +578,19 @@ namespace TestingRW
             }
             else if (loadedgame == "halo 2")
             {
-                H2Inject(sender, e);
+               // H2Inject(sender, e);
             }
             else if (loadedgame == "halo 3")
             {
-                H3Inject(sender, e);
+                //H3Inject(sender, e);
             }
             else if (loadedgame == "halo reach")
             {
                 //HRInject(sender, e);
+            }
+            else if (loadedgame == "halo odst")
+            {
+                ODSTInject(sender, e);
             }
 
         }
@@ -1001,7 +1059,7 @@ namespace TestingRW
 
                 //binary search stuff, remove this for releases
                 int[] extrap = new int[] { 0, 0};
-                if (Startoffset.Text != "ignore")
+                if (Startoffset.Text != "ignore" && debugcheckbox.IsChecked == true)
                 {
    /*                 byte[] buffer9 = new byte[8257536];
                 if (ReadProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offset), buffer9, buffer9.Length, out int bytesRead))
@@ -1012,7 +1070,7 @@ namespace TestingRW
                     throw new Win32Exception();*/
 
        
-                    string hardcodesafepath = @"B:\HaloFiles\hcm h3\run22.bin";
+                    string hardcodesafepath = @"B:\HaloFiles\hcm h3\cleanreproducibles\Sorix_ArkKnown.bin";
                     if (File.Exists(hardcodesafepath))
                     { Console.WriteLine("well the file is valid"); }
                     FileStream fs3 = new FileStream(hardcodesafepath, FileMode.Open, FileAccess.Read);
@@ -1038,7 +1096,12 @@ namespace TestingRW
 
                 //setup a 2d array with the values we need to preserve (offset, length)
                 //int[][] PreserveLocations = new int[][] { new int[] { 0x8, 0x4 }, new int[] { 0x130, 0x4 }, new int[] { 0x138, 0x4 }, new int[] { 0xFAD8, 0x4 }, new int[] { 0xFADC, 0x4 }, new int[] { 0xFAE0, 0x4 }, new int[] { 0xFAE4, 0x4 }, new int[] { 0xFAE8, 0x4 }, new int[] { 0xFAEC, 0x4 }, new int[] { 0xFAF0, 0x4 } };
-                int[][] PreserveLocations = new int[][] { new int[] { 0x8, 0x4 }};
+                int[][] PreserveLocations = new int[][] { new int[] { 0x8, 0x4 }, new int[] { 0x3F0528, 0x16 }, new int[] { 0x3F4524, 0x2 }, /*new int[] { 0x3F458B, 0x2 },*/ new int[] { 0x3F051C, 0x8 }/*, new int[] { 0x3F05BC, 0x8 }, new int[] { 0x3F06E4, 0x8 }, new int[] { 0x3F4EB4, 0x8 }*/ };
+                //possibly unncessary preserves: { 0x3F458B, 0x2 }, { 0x3F05BC, 0x8 }, { 0x3F06E4, 0x8 }
+
+                //some extra debug shit
+                
+
                 //other locations with bspstate; 93888, 63eaac, 72e1f8
 
                 //PreserveLocations = PreserveLocations.Append(extrap).ToArray();
@@ -1053,13 +1116,13 @@ namespace TestingRW
                     {
                         //overwrite the stored cp buffer with new vals
                         //first let's add a check if they were actually any different..
-                       // for (int j = 0; j < tempbuffer.Length; j++)
-                        //{
-                            //if (tempbuffer[j] != buffer[i[0] + j])
-                            //{
-                            //    Console.WriteLine("mismatch: " + Convert.ToString(i[0], 16) + ": " + j + ", " + Convert.ToString(tempbuffer[j], 16) + " to " + Convert.ToString(buffer[i[0] + j], 16));
-                            //}
-                       // }
+                        for (int j = 0; j < tempbuffer.Length; j++)
+                        {
+                            if (tempbuffer[j] != buffer[i[0] + j])
+                            {
+                                Console.WriteLine("mismatch: " + Convert.ToString(i[0], 16) + ": " + j + ", " + Convert.ToString(tempbuffer[j], 16) + " to " + Convert.ToString(buffer[i[0] + j], 16));
+                            }
+                        }
                         Array.ConstrainedCopy(tempbuffer, 0, buffer, i[0], i[1]);
                         Console.WriteLine("successfully copied over buffer at " + i[0] + " , val: " + tempbuffer[0] + " " + tempbuffer[1]);
                     }
@@ -1363,6 +1426,70 @@ namespace TestingRW
 
         }
 
+
+
+        private void ODSTDump(object sender, RoutedEventArgs e)
+        {
+
+            string path = ChosenDump.Text + "\\" + ChosenFilename.Text + ".bin";
+
+            if (!IsValidPath(path))
+            {
+                System.Windows.MessageBox.Show("There was something wrong with your chosen dumping file path");
+                return;
+            }
+
+            Console.WriteLine("DUMPING ODST CP");
+            GetBaseAddresses();
+
+            Process myProcess = Process.GetProcessesByName("MCC-Win64-Shipping")[0];
+            IntPtr processHandle = OpenProcess(PROCESS_WM_READ, false, myProcess.Id);
+
+
+            bool DRflag;
+            byte[] DRbuffer = new byte[1];
+            IntPtr DRbaseaddy = Globals.halo3odstdll + Globals.halo3odstDRflag;
+
+            if (ReadProcessMemory(processHandle, DRbaseaddy, DRbuffer, DRbuffer.Length, out int DRbytesRead))
+            {
+                DRflag = Convert.ToBoolean(DRbuffer[0]);
+            }
+            else
+                throw new Win32Exception();
+
+
+            byte[] buffer = new byte[9371648];
+            IntPtr baseaddy = Globals.halo3odstdll + Globals.halo3odstCPaddy;
+            int[] offset = new int[1];
+            if (!DRflag)
+            {
+                offset[0] = 0x0; //first cp
+            }
+            else
+            {
+                offset[0] = 0x8F0000; //second cp
+            }
+
+            if (ReadProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offset), buffer, buffer.Length, out int bytesRead))
+            {
+                File.WriteAllBytes(path, buffer);
+                FileInfo test = new FileInfo(path);
+                if (File.Exists(test.ToString()) && test.Length > 1000)
+                {
+                    Console.WriteLine("SUCESSFULLY DUMPED ODST CP, LENGTH: " + test.Length.ToString());
+                    Log.Content = "Log: ODST: Successfully dumped " + "\\" + ChosenFilename.Text + ".bin";
+                }
+            }
+            else
+                throw new Win32Exception();
+            CloseHandle(processHandle);
+
+
+        }
+
+        private void ODSTInject(object sender, RoutedEventArgs e)
+        { }
+
         // down here is where I put code I nicked from StackOverflow
 
         public static IntPtr FindPointerAddy(IntPtr hProc, IntPtr ptr, int[] offsets)
@@ -1407,7 +1534,24 @@ namespace TestingRW
             return isValid;
         }
 
+        private void CheckBoxon(object sender, RoutedEventArgs e)
+        {
+            Startoffset.IsEnabled = true;
+            Endoffset.IsEnabled = true;
+            //extrapreserves.IsEnabled = true;
+            Startoffset.Text = "ignore";
+            Endoffset.Text = "me";
+           // extrapreserves.Text = "0";
 
+        }
+
+        private void CheckBoxoff(object sender, RoutedEventArgs e)
+        {
+            Startoffset.IsEnabled = false;
+            Endoffset.IsEnabled = false;
+           // extrapreserves.IsEnabled = false;
+
+        }
 
 
 
