@@ -1640,16 +1640,16 @@ namespace TestingRW
 
 
                 //bsp manip
-                byte[] buffer6 = new byte[16];
-                Array.Copy(buffer, 0xFAD0, buffer6, 0, 16);//read bsp from checkpoint file
+                byte[] buffer6 = new byte[32];
+                Array.Copy(buffer, 0xFAC0, buffer6, 0, 32);//read bsp from checkpoint file
                 IntPtr baseaddy6;
                 if (!DRflag)
                 {
-                    baseaddy6 = Globals.halo3odstdll + 0x1C6A840; //first cp
+                    baseaddy6 = Globals.halo3odstdll + 0x1C6A830; //first cp
                 }
                 else
                 {
-                    baseaddy6 = Globals.halo3odstdll + 0x1C7A368; //second cp
+                    baseaddy6 = Globals.halo3odstdll + 0x1C7A358; //second cp
                 }
 
                 if (WriteProcessMemory(processHandle, baseaddy6, buffer6, buffer6.Length, out int bytesWritten6)) //write it in so the game knows what bsp to load
