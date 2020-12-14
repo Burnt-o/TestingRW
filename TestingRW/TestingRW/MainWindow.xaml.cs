@@ -1575,7 +1575,7 @@ namespace TestingRW
                                      throw new Win32Exception();*/
 
 
-                    string hardcodesafepath = @"B:\HaloFiles\hcm odst\cleanreproducibles\Burnt_DHknown.bin";
+                    string hardcodesafepath = @"B:\HaloFiles\hcm odst\cleanreproducibles\Mikko_DHknown.bin";
                     if (File.Exists(hardcodesafepath))
                     { Console.WriteLine("well the file is valid"); }
                     FileStream fs3 = new FileStream(hardcodesafepath, FileMode.Open, FileAccess.Read);
@@ -1600,10 +1600,10 @@ namespace TestingRW
 
                 //setup a 2d array with the values we need to preserve (offset, length)
                 //int[][] PreserveLocations = new int[][] { new int[] { 0x8, 0x4 }, new int[] { 0x130, 0x4 }, new int[] { 0x138, 0x4 }, new int[] { 0xFAD8, 0x4 }, new int[] { 0xFADC, 0x4 }, new int[] { 0xFAE0, 0x4 }, new int[] { 0xFAE4, 0x4 }, new int[] { 0xFAE8, 0x4 }, new int[] { 0xFAEC, 0x4 }, new int[] { 0xFAF0, 0x4 } };
-                int[][] PreserveLocations = new int[][] {  };
+                int[][] PreserveLocations = new int[][] { new int[] { 0x4005AC, 0x4 }, new int[] { 0x4005B8, 0x2 }, new int[] { 0x405A34, 0x2 } };
                 //possibly unncessary preserves: { 0x3F458B, 0x2 }, { 0x3F05BC, 0x8 }, { 0x3F06E4, 0x8 }
 
-                //some extra debug shit
+                //some extra debug shit 0x4005B8, 0x2
 
 
                 //other locations with bspstate; 93888, 63eaac, 72e1f8
@@ -1640,8 +1640,8 @@ namespace TestingRW
 
 
                 //bsp manip
-                byte[] buffer6 = new byte[32];
-                Array.Copy(buffer, 0xFAC0, buffer6, 0, 32);//read bsp from checkpoint file
+                byte[] buffer6 = new byte[60];
+                Array.Copy(buffer, 0xFAC0, buffer6, 0, 60);//read bsp from checkpoint file
                 IntPtr baseaddy6;
                 if (!DRflag)
                 {
