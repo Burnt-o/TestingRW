@@ -41,11 +41,12 @@ namespace TestingRW
             public static System.IntPtr halo1dll;
             public static System.IntPtr halo2dll;
             public static System.IntPtr halo3dll;
+            public static System.IntPtr halo4dll;
             public static System.IntPtr haloreachdll;
             public static System.IntPtr halo3odstdll;
             public static System.IntPtr MCCexe;
 
-            public static int gameindicator = 0x038E7CC8;
+            public static int gameindicator = 0x038E9028;
 
             public static int haloreachDRflag = 0x259DACC;
             public static int haloreachCPaddy = 0x2839810;
@@ -56,12 +57,16 @@ namespace TestingRW
             public static int halo2bspbyteA = 0xDF1DE8;
             public static int halo2bspbyteB = 0xDF3108;
 
-            public static int halo3DRflag = 0x1C5DF48;
-            public static int halo3CPaddy = 0x01DB5B40;
+            public static int halo3DRflag = 0x1C727F8;
+            public static int halo3CPaddy = 0x01DCA980;
 
             public static int halo3odstCPaddy = 0x01D45750;
             public static int halo3odstDRflag = 0x1C5AD68;
             public static int halo3odstlevelname = 0xA4F2E5;
+
+
+            public static int halo4DRflag = 0x243A37C;
+            public static int halo4CPaddy = 0x027547F0;
 
             public static Int32 ProcessID;
             public static IntPtr GlobalProcessHandle;
@@ -208,6 +213,11 @@ namespace TestingRW
                         //Console.WriteLine(myProcessModule.ModuleName + " : " + myProcessModule.BaseAddress);
                         break;
 
+                    case "halo4.dll":
+                        Globals.halo4dll = myProcessModule.BaseAddress;
+                        //Console.WriteLine(myProcessModule.ModuleName + " : " + myProcessModule.BaseAddress);
+                        break;
+
                     case "halo3odst.dll":
                         Globals.halo3odstdll = myProcessModule.BaseAddress;
                         //Console.WriteLine(myProcessModule.ModuleName + " : " + myProcessModule.BaseAddress);
@@ -280,6 +290,11 @@ namespace TestingRW
                     case 6:
                         loadedgame = "halo reach";
                         Console.WriteLine("game is halo reach");
+                        break;
+
+                    case 3:
+                        loadedgame = "halo 4";
+                        Console.WriteLine("game is halo 4");
                         break;
 
 
@@ -437,7 +452,42 @@ namespace TestingRW
 
                 byte[] buffer = new byte[3];
                 //get levelname from loaded cp instead
-                IntPtr baseaddy = Globals.halo3dll + 0x1D4F22B;
+                IntPtr baseaddy = Globals.halo3dll + 0x1CEC600;
+                ReadProcessMemory(processHandle, baseaddy, buffer, buffer.Length, out int bytesRead);
+                test = (Encoding.ASCII.GetString(buffer) + " (" + bytesRead.ToString() + "bytes)");
+                CloseHandle(processHandle);
+
+
+
+
+                /*  ProcessModule myProcessModule;
+                  ProcessModuleCollection myProcessModuleCollection = myProcess.Modules;
+                  Console.WriteLine("Base addresses of the modules associated "
+                      + "with 'mcc' are:");
+                  // Display the 'BaseAddress' of each of the modules.
+                  for (int i = 0; i < myProcessModuleCollection.Count; i++)
+                  {
+                      myProcessModule = myProcessModuleCollection[i];
+                      Console.WriteLine(myProcessModule.ModuleName + " : "
+                          + myProcessModule.BaseAddress);
+                  }*/
+
+
+
+
+            }
+            else if (loadedgame == "halo 4")
+            {
+                //unsupporting non hr for now
+                GetBaseAddresses();
+
+                Process myProcess = Process.GetProcessesByName("MCC-Win64-Shipping")[0];
+                IntPtr processHandle = OpenProcess(PROCESS_WM_READ, false, myProcess.Id);
+
+
+                byte[] buffer = new byte[3];
+                //get levelname from loaded cp instead
+                IntPtr baseaddy = Globals.halo4dll + 0x27633A3;
                 ReadProcessMemory(processHandle, baseaddy, buffer, buffer.Length, out int bytesRead);
                 test = (Encoding.ASCII.GetString(buffer) + " (" + bytesRead.ToString() + "bytes)");
                 CloseHandle(processHandle);
@@ -556,13 +606,17 @@ namespace TestingRW
             {
                 //H3Dump(sender, e);
             }
+            else if (loadedgame == "halo 4")
+            {
+                H4Dump(sender, e);
+            }
             else if (loadedgame == "halo reach")
             {
                 //HRDump(sender, e);
             }
             else if (loadedgame == "halo odst")
             {
-                ODSTDump(sender, e);
+                //ODSTDump(sender, e);
             }
 
         }
@@ -584,13 +638,17 @@ namespace TestingRW
             {
                 //H3Inject(sender, e);
             }
+            else if (loadedgame == "halo 34")
+            {
+                H4Inject(sender, e);
+            }
             else if (loadedgame == "halo reach")
             {
                 //HRInject(sender, e);
             }
             else if (loadedgame == "halo odst")
             {
-                ODSTInject(sender, e);
+                //ODSTInject(sender, e);
             }
 
         }
@@ -1134,15 +1192,15 @@ namespace TestingRW
 
                 //bsp manip
                 byte[] buffer6 = new byte[44];
-                Array.Copy(buffer, 0xFAD8, buffer6, 0, 44);//read bsp from checkpoint file
+                Array.Copy(buffer, 0xFBD8, buffer6, 0, 44);//read bsp from checkpoint file
                 IntPtr baseaddy6;
                 if (!DRflag)
                 {
-                    baseaddy6 = Globals.halo3dll + 0x1C6DA28; //first cp
+                    baseaddy6 = Globals.halo3dll + 0x1C823D8; //first cp
                 }
                 else
                 {
-                    baseaddy6 = Globals.halo3dll + 0x1C7D558; //second cp
+                    baseaddy6 = Globals.halo3dll + 0x1C92008; //second cp
                 }
 
                 if (WriteProcessMemory(processHandle, baseaddy6, buffer6, buffer6.Length, out int bytesWritten6)) //write it in so the game knows what bsp to load
@@ -1157,13 +1215,13 @@ namespace TestingRW
                 //NEXT DO HASH STUFF
                 //first, store the old hash value (not really necessary but helps debugging)
                 byte[] oldhash = new byte[20];
-                Array.Copy(buffer, 0xFB18, oldhash, 0, 20);
+                Array.Copy(buffer, 0xFC04, oldhash, 0, 20);
                 Console.WriteLine("oldhash: " + BitConverter.ToString(oldhash).Replace("-", ""));
 
 
                 //zero out the hash at FB18 (dec 20 bytes)
                 byte[] zeroes = new byte[20];
-                Array.Copy(zeroes, 0, buffer, 0xFB18, 20);
+                Array.Copy(zeroes, 0, buffer, 0xFC04, 20);
                 //Console.WriteLine("zeroes: " + BitConverter.ToString(buffer.Skip(0xFB18).Take(20).ToArray()).Replace("-", ""));
 
                 //then calculate the sha-1 hash
@@ -1172,7 +1230,7 @@ namespace TestingRW
                     byte[] newhash = cryptoProvider.ComputeHash(buffer);
 
                     //write the hash at FB18 
-                    Array.Copy(newhash, 0, buffer, 0xFB18, 20);
+                    Array.Copy(newhash, 0, buffer, 0xFC04, 20);
                     Console.WriteLine("newhash: " + BitConverter.ToString(newhash).Replace("-", ""));
 
 
@@ -1201,6 +1259,73 @@ namespace TestingRW
                 System.Windows.MessageBox.Show("file doesn't exist you silly");
             }
 
+        }
+
+
+
+
+        private void H4Dump(object sender, RoutedEventArgs e)
+        {
+
+            string path = ChosenDump.Text + "\\" + ChosenFilename.Text + ".bin";
+
+            if (!IsValidPath(path))
+            {
+                System.Windows.MessageBox.Show("There was something wrong with your chosen dumping file path");
+                return;
+            }
+
+            Console.WriteLine("DUMPING H4 CP");
+            GetBaseAddresses();
+
+            Process myProcess = Process.GetProcessesByName("MCC-Win64-Shipping")[0];
+            IntPtr processHandle = OpenProcess(PROCESS_WM_READ, false, myProcess.Id);
+
+
+            bool DRflag;
+            byte[] DRbuffer = new byte[1];
+            IntPtr DRbaseaddy = Globals.halo4dll + Globals.halo4DRflag;
+
+            if (ReadProcessMemory(processHandle, DRbaseaddy, DRbuffer, DRbuffer.Length, out int DRbytesRead))
+            {
+                DRflag = Convert.ToBoolean(DRbuffer[0]);
+            }
+            else
+                throw new Win32Exception();
+
+
+            byte[] buffer = new byte[0x9CD000];
+            IntPtr baseaddy = Globals.halo4dll + Globals.halo4CPaddy;
+            int[] offset = new int[1];
+            if (!DRflag)
+            {
+                offset[0] = 0x0; //first cp
+            }
+            else
+            {
+                offset[0] = 0x9D0000; //second cp
+            }
+
+            if (ReadProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offset), buffer, buffer.Length, out int bytesRead))
+            {
+                File.WriteAllBytes(path, buffer);
+                FileInfo test = new FileInfo(path);
+                if (File.Exists(test.ToString()) && test.Length > 1000)
+                {
+                    Console.WriteLine("SUCESSFULLY DUMPED H4 CP, LENGTH: " + test.Length.ToString());
+                    Log.Content = "Log: H4: Successfully dumped " + "\\" + ChosenFilename.Text + ".bin";
+                }
+            }
+            else
+                throw new Win32Exception();
+            CloseHandle(processHandle);
+
+
+        }
+
+        private void H4Inject(object sender, RoutedEventArgs e)
+        { 
+        
         }
 
 
