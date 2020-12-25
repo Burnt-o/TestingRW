@@ -638,7 +638,7 @@ namespace TestingRW
             {
                 //H3Inject(sender, e);
             }
-            else if (loadedgame == "halo 34")
+            else if (loadedgame == "halo 4")
             {
                 H4Inject(sender, e);
             }
@@ -1323,10 +1323,218 @@ namespace TestingRW
 
         }
 
+
         private void H4Inject(object sender, RoutedEventArgs e)
-        { 
-        
+        {
+            string path = ChosenInject.Text;
+
+            if (File.Exists(path))
+            {
+                Console.WriteLine("Injecting H4 CP");
+                GetBaseAddresses();
+
+                Process myProcess = Process.GetProcessesByName("MCC-Win64-Shipping")[0];
+                IntPtr processHandle = OpenProcess(PROCESS_ALL_ACCESS, false, myProcess.Id);
+
+                string filename = path;
+                FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read);
+                // Create a byte array of file stream length
+                byte[] buffer = System.IO.File.ReadAllBytes(filename);
+                //Read block of bytes from stream into the byte array
+                fs.Read(buffer, 0, System.Convert.ToInt32(fs.Length));
+                //Close the File Stream
+                fs.Close();
+                Console.WriteLine("ready to inject, buffer length: " + buffer.Length.ToString());
+
+
+
+
+                /*                //do a hash check here to make sure we're getting the right value
+
+                                //first, store the old hash value
+                                byte[] oldhash = new byte[20];
+                                Array.Copy(buffer, 0xFB18, oldhash, 0, 20);
+                                Console.WriteLine("oldhash: " + BitConverter.ToString(oldhash).Replace("-", ""));
+
+                                //then zero it out
+                                byte[] zeroes = new byte[20];
+                                Array.Copy(zeroes, 0, buffer, 0xFB18, 20);
+                                Console.WriteLine("zeroes: " + BitConverter.ToString(buffer.Skip(0xFB18).Take(20).ToArray()).Replace("-", ""));
+
+                                //then calculate the sha-1 hash
+                                using (var cryptoProvider = new SHA1CryptoServiceProvider())
+                                {
+                                    string hash = BitConverter.ToString(cryptoProvider.ComputeHash(buffer));
+                                    Console.WriteLine("verify hash: " + hash);
+                                    //do something with hash
+                                }
+                                */
+
+
+
+
+                bool DRflag;
+                byte[] DRbuffer = new byte[1];
+                IntPtr DRbaseaddy = Globals.halo4dll + Globals.halo4DRflag;
+
+                if (ReadProcessMemory(processHandle, DRbaseaddy, DRbuffer, DRbuffer.Length, out int DRbytesRead))
+                {
+                    DRflag = Convert.ToBoolean(DRbuffer[0]);
+                }
+                else
+                    throw new Win32Exception();
+
+
+
+                IntPtr baseaddy = Globals.halo4dll + Globals.halo4CPaddy;
+                int[] offset = new int[1];
+                if (!DRflag)
+                {
+                    offset[0] = 0x0; //first cp
+                }
+                else
+                {
+                    offset[0] = 0x9D0000; //second cp
+                }
+
+
+
+                //binary search stuff, remove this for releases
+                int[] extrap = new int[] { 0, 0 };
+                if (Startoffset.Text != "ignore" && debugcheckbox.IsChecked == true)
+                {
+                    /*                 byte[] buffer9 = new byte[8257536];
+                                 if (ReadProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offset), buffer9, buffer9.Length, out int bytesRead))
+                                 {
+                                         Console.WriteLine("cool");
+                                 }
+                                 else
+                                     throw new Win32Exception();*/
+
+
+                    string hardcodesafepath = @"B:\HaloFiles\hcm H4\cleanreproducibles\Nell_ShutdownEasy.bin";
+                    if (File.Exists(hardcodesafepath))
+                    { Console.WriteLine("well the file is valid"); }
+                    FileStream fs3 = new FileStream(hardcodesafepath, FileMode.Open, FileAccess.Read);
+                    // Create a byte array of file stream length
+                    byte[] buffer3 = System.IO.File.ReadAllBytes(hardcodesafepath);
+                    //Read block of bytes from stream into the byte array
+                    fs3.Read(buffer3, 0, System.Convert.ToInt32(fs3.Length));
+                    //Close the File Stream
+                    fs3.Close();
+                    int startoffset = int.Parse(Startoffset.Text, System.Globalization.NumberStyles.HexNumber);
+                    int endoffset = int.Parse(Endoffset.Text, System.Globalization.NumberStyles.HexNumber);
+                    Console.Write("parsing correct? A: " + startoffset);
+                    Console.Write("parsing correct? B: " + endoffset);
+                    Console.WriteLine("length of new buffer4; " + Convert.ToString(endoffset - startoffset, 16));
+                    var buffer4 = new byte[endoffset - startoffset];
+                    Array.Copy(buffer3, startoffset, buffer, startoffset, endoffset - startoffset);
+                  
+                }
+
+
+
+
+
+                //setup a 2d array with the values we need to preserve (offset, length)
+                int[][] PreserveLocations = new int[][] { new int[] {0x4F66E8, 0x4 } };
+               
+                 int[] tempoffset = new int[1];
+                foreach (int[] i in PreserveLocations)
+                {
+                    tempoffset[0] = offset[0] + i[0];
+                    byte[] tempbuffer = new byte[i[1]];
+                    if (ReadProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, tempoffset), tempbuffer, tempbuffer.Length, out int bytesWritten7))
+                    {
+                        //overwrite the stored cp buffer with new vals
+                        //first let's add a check if they were actually any different..
+                        for (int j = 0; j < tempbuffer.Length; j++)
+                        {
+                            if (tempbuffer[j] != buffer[i[0] + j])
+                            {
+                                Console.WriteLine("mismatch: " + Convert.ToString(i[0], 16) + ": " + j + ", " + Convert.ToString(tempbuffer[j], 16) + " to " + Convert.ToString(buffer[i[0] + j], 16));
+                            }
+                        }
+                        Array.ConstrainedCopy(tempbuffer, 0, buffer, i[0], i[1]);
+                        Console.WriteLine("successfully copied over buffer at " + i[0] + " , val: " + tempbuffer[0] + " " + tempbuffer[1]);
+                    }
+                    else
+                        throw new Win32Exception();
+                }
+
+
+
+                //bsp manip
+               /* byte[] buffer6 = new byte[44];
+                Array.Copy(buffer, 0xFBD8, buffer6, 0, 44);//read bsp from checkpoint file
+                IntPtr baseaddy6;
+                if (!DRflag)
+                {
+                    baseaddy6 = Globals.halo4dll + 0x1C823D8; //first cp
+                }
+                else
+                {
+                    baseaddy6 = Globals.halo4dll + 0x1C92008; //second cp
+                }
+
+                if (WriteProcessMemory(processHandle, baseaddy6, buffer6, buffer6.Length, out int bytesWritten6)) //write it in so the game knows what bsp to load
+                {
+                    Console.WriteLine("Successfully pasted H4 bsp byte");
+                    //Log.Content = "Successfully pasted hr player int";
+                }
+                else
+                    throw new Win32Exception();*/
+
+
+                //NEXT DO HASH STUFF
+                //first, store the old hash value (not really necessary but helps debugging)
+/*                byte[] oldhash = new byte[20];
+                Array.Copy(buffer, 0xFC04, oldhash, 0, 20);
+                Console.WriteLine("oldhash: " + BitConverter.ToString(oldhash).Replace("-", ""));
+
+
+                //zero out the hash at FB18 (dec 20 bytes)
+                byte[] zeroes = new byte[20];
+                Array.Copy(zeroes, 0, buffer, 0xFC04, 20);
+                //Console.WriteLine("zeroes: " + BitConverter.ToString(buffer.Skip(0xFB18).Take(20).ToArray()).Replace("-", ""));
+
+                //then calculate the sha-1 hash
+                using (var cryptoProvider = new SHA1CryptoServiceProvider())
+                {
+                    byte[] newhash = cryptoProvider.ComputeHash(buffer);
+
+                    //write the hash at FB18 
+                    Array.Copy(newhash, 0, buffer, 0xFC04, 20);
+                    Console.WriteLine("newhash: " + BitConverter.ToString(newhash).Replace("-", ""));
+
+
+                }
+*/
+
+                if (WriteProcessMemory(processHandle, FindPointerAddy(processHandle, baseaddy, offset), buffer, buffer.Length, out int bytesWritten))
+                {
+                    Console.WriteLine("Successfully injected H4 CP, bytes written: " + bytesWritten.ToString());
+                    Log.Content = "Log: H4: Successfully injected " + "\\" + Path.GetFileName(path);
+                }
+                else
+                    throw new Win32Exception();
+
+
+
+
+
+
+                CloseHandle(processHandle);
+
+            }
+            else
+            {
+                Console.WriteLine("file doesn't exist you silly");
+                System.Windows.MessageBox.Show("file doesn't exist you silly");
+            }
+
         }
+
 
 
 
